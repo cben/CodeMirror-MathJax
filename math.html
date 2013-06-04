@@ -55,7 +55,7 @@ dog's back.
         window.lll = line;
       });
 
-      editor.on(doc, "change", function(doc, changeObj) {
+      editor.on("change", function(doc, changeObj) {
         console.log("change", changeObj);
         window.ccc = changeObj;
       });
