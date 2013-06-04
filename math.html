@@ -16,6 +16,15 @@
     </style>
 
     <script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+          displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+          processEscapes: true
+        },
+      });
+    </script>
 
     <!-- I'm a JS noob, so jQuery is my only hope of writing somewhat portable code ;-).
          Drop ".min" to get non-minified source for debugging. -->
@@ -29,20 +38,33 @@
 
 **Bold** text in a normal-size paragraph.
 
-Foo $sum^y_z x$ bar.
+Foo $\sum^y_z x$ bar.
 
 ## A Second Level Header
 
 $$\sum^b_c a$$
 </textarea></form>
     <script id="script">
-      var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
-        lineNumbers: true,
-        lineWrapping: true,
-        mode: "markdown"
-      });
+      var editor = CodeMirror.fromTextArea(document.getElementById("code"),
+                                           {lineNumbers: true,
+                                            lineWrapping: true,
+                                            mode: "markdown"});
       var doc = editor.getDoc();
       window.eee = editor;
+
+      function render(from, to) {
+        var text = editor.getRange(from, to);
+        var elem = $("<span>").text(text)[0];
+        console.log("render", text, elem);
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, elem]);
+        MathJax.Hub.Queue(function() {
+          doc.markText(from, to, {replacedWith: elem,
+                                  clearOnEnter: true});
+        });
+      }
+
+      render({line: 4, ch: 4}, {line: 4, ch: 16});
+      render({line: 8, ch: 0}, {line: 8, ch: 14});
 
       editor.on("renderLine", function(editor, line, element) {
         console.log("renderLine", line, element);
@@ -54,6 +76,8 @@ $$\sum^b_c a$$
         window.ccc = changeObj;
       });
 
+
+      
       //Mathjax.Hub.Queue(["Typeset", Mathjax.Hub, ...]);
     </script>
   </body>
