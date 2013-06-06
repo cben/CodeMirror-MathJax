@@ -53,23 +53,32 @@ $$\sum^b_c a$$
                                             mode: "markdown"});
       var doc = editor.getDoc();
 
+      function posLE(a, b) {
+        return (a.line < b.line) || (a.line == b.line && a.ch <= b.ch);
+      }
+
       function processMath(from, to) {
         var text = editor.getRange(from, to);
         var elem = $("<span>").text(text)[0];
         console.log("processMath", text, elem);
         MathJax.Hub.Queue(["Typeset", MathJax.Hub, elem]);
         MathJax.Hub.Queue(function() {
+          // If cursor is inside formula, keep it in source form.
+          // TODO: behavior during selection?
+          var cursor = doc.getCursor();
+          if(posLE(from, cursor) && posLE(cursor, to)) {
+            return;
+          }
           doc.markText(from, to, {replacedWith: elem,
                                   clearOnEnter: true});
         });
       }
-      /*
-      processMath({line: 4, ch: 4}, {line: 4, ch: 16});
-      processMath({line: 8, ch: 0}, {line: 8, ch: 14});
-      */
 
-      function processLine(line, text) {
+      function processLine(lineHandle) {
+        var text = lineHandle.text;
+        var line = doc.getLineNumber(lineHandle);
         console.log(line, text);
+
         var inline = /\$.+\$/g; // TODO: tighten, display math
         var match;
         while((match = inline.exec(text)) != null) {
@@ -79,19 +88,23 @@ $$\sum^b_c a$$
         }
       }
 
-      doc.eachLine(function(lineHandle) {
-        processLine(doc.getLineNumber(lineHandle), lineHandle.text);
-      });
-
-      editor.on("renderLine", function(editor, line, element) {
+      /*editor.on("renderLine", function(editor, line, element) {
         console.log("renderLine", line, element);
         window.lll = line;
-      });
+      });*/
 
-      editor.on("change", function(doc, changeObj) {
+      editor.on("change", function processChange(doc, changeObj) {
         console.log("change", changeObj);
         window.ccc = changeObj;
+        // TODO: changeObj.{from,to} are pre-change coordinates.
+        doc.eachLine(changeObj.from.line, changeObj.to.line + 1,
+                     processLine);
+        if(changeObj.next) {
+          processChange(changeObj.next);
+        }
       });
+
+      doc.eachLine(processLine);
     </script>
   </body>
 </html>
