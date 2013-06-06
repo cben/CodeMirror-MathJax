@@ -53,8 +53,12 @@ $$\sum^b_c a$$
                                             mode: "markdown"});
       var doc = editor.getDoc();
 
-      function posLE(a, b) {
-        return (a.line < b.line) || (a.line == b.line && a.ch <= b.ch);
+      // Return negative / 0 / positive.
+      function posCmp(a, b) {
+        if (b.line != a.line) {
+          return b.line - a.line;
+        }
+        return b.ch - a.ch;
       }
 
       // TODO: pass doc, editor as needed.
@@ -62,13 +66,14 @@ $$\sum^b_c a$$
       function processMath(from, to) {
         var text = editor.getRange(from, to);
         var elem = $("<span>").text(text)[0];
-        console.log("processMath", text, elem);
+          var cursor = doc.getCursor();
+        console.log("processMath", text, elem, posCmp(from, cursor), posCmp(cursor, to));
         MathJax.Hub.Queue(["Typeset", MathJax.Hub, elem]);
         MathJax.Hub.Queue(function() {
           // If cursor is inside formula, keep it in source form.
           // TODO: behavior during selection?
           var cursor = doc.getCursor();
-          if(posLE(from, cursor) && posLE(cursor, to)) {
+          if(posCmp(from, cursor) > 0 && posCmp(cursor, to) > 0) {
             return;
           }
           doc.markText(from, to, {replacedWith: elem,
