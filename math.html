@@ -57,6 +57,8 @@ $$\sum^b_c a$$
         return (a.line < b.line) || (a.line == b.line && a.ch <= b.ch);
       }
 
+      // TODO: pass doc, editor as needed.
+
       function processMath(from, to) {
         var text = editor.getRange(from, to);
         var elem = $("<span>").text(text)[0];
@@ -77,7 +79,7 @@ $$\sum^b_c a$$
       function processLine(lineHandle) {
         var text = lineHandle.text;
         var line = doc.getLineNumber(lineHandle);
-        console.log(line, text);
+        console.log("processLine", line, text);
 
         var inline = /\$.+\$/g; // TODO: tighten, display math
         var match;
@@ -102,6 +104,13 @@ $$\sum^b_c a$$
         if(changeObj.next) {
           processChange(changeObj.next);
         }
+      });
+
+      editor.on("cursorActivity", function(doc) {
+        // TODO: selection behavior?
+        var cursor = doc.getCursor();
+        console.log("cursorActivity", cursor);
+        processLine(doc.getLineHandle(cursor.line));
       });
 
       doc.eachLine(processLine);
