@@ -56,10 +56,7 @@ $$\sum^b_c a$$
 
       // Return negative / 0 / positive.
       function posCmp(a, b) {
-        if (b.line != a.line) {
-          return b.line - a.line;
-        }
-        return b.ch - a.ch;
+        return (b.line - a.line) || (b.ch - a.ch);
       }
 
       // TODO: pass doc, editor as needed.
