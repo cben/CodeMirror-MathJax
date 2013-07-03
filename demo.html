@@ -61,24 +61,39 @@ $$\sum^b_c a$$
 
       // TODO: pass doc, editor as needed.
 
+      // If cursor is inside a formula, we don't render it until the
+      // cursor leaves it.  To cleanly detect when that happens we
+      // still markText() it but without replacedWith and store the
+      // marker here.
+      var unrenderedMath = null;
+
       function processMath(from, to) {
         var text = editor.getRange(from, to);
         var elem = $("<span>").text(text)[0];
-          var cursor = doc.getCursor();
-        console.log("processMath", text, elem, posCmp(from, cursor), posCmp(cursor, to));
+        var cursor = doc.getCursor();
+        console.log("processMath", text, elem,
+                    posCmp(from, cursor), posCmp(cursor, to));
         MathJax.Hub.Queue(["Typeset", MathJax.Hub, elem]);
         MathJax.Hub.Queue(function() {
-          // If cursor is inside formula, keep it in source form.
           // TODO: behavior during selection?
           var cursor = doc.getCursor();
           if(posCmp(from, cursor) > 0 && posCmp(cursor, to) > 0) {
-            return;
+            // TODO: what if unrenderedMath is already set?
+            unrenderedMath = doc.markText(from, to);
+          } else {
+            var range = doc.markText(from, to, {replacedWith: elem,
+                                                clearOnEnter: true});
+            editor.on(range, "clear", function() {
+              console.log("clear", range);
+              var fromTo = range.find();
+              console.log("clear", fromTo);
+              unrenderedMath = doc.markText(fromTo.from, fromTo.to);
+            });
           }
-          doc.markText(from, to, {replacedWith: elem,
-                                  clearOnEnter: true});
         });
       }
 
+      // TODO: multi line $...$. Needs an approach similar to overlay modes.
       function processLine(lineHandle) {
         var text = lineHandle.text;
         var line = doc.getLineNumber(lineHandle);
@@ -112,8 +127,16 @@ $$\sum^b_c a$$
       editor.on("cursorActivity", function(doc) {
         // TODO: selection behavior?
         var cursor = doc.getCursor();
-        console.log("cursorActivity", cursor);
-        processLine(doc.getLineHandle(cursor.line));
+        if (unrenderedMath == null) {
+          return;
+        }
+        var range = unrenderedMath.find();
+        console.log("cursorActivity", cursor, range.from, range.to);
+        if(posCmp(range.from, cursor) > 0 && posCmp(cursor, range.to) > 0) {
+          return;
+        }
+        processMath(range.from, range.to);
+        //unrenderedMath = false;
       });
 
       doc.eachLine(processLine);
