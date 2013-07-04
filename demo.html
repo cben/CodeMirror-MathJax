@@ -82,11 +82,11 @@ $$\sum^b_c a$$
             unrenderedMath = doc.markText(from, to);
           } else {
             var range = doc.markText(from, to, {replacedWith: elem,
-                                                clearOnEnter: true});
-            editor.on(range, "clear", function() {
-              console.log("clear", range);
+                                                clearOnEnter: false});
+            CodeMirror.on(range, "beforeCursorEnter", function() {
               var fromTo = range.find();
-              console.log("clear", fromTo);
+              console.log("beforeCursorEnter", fromTo, range);
+              range.clear();
               unrenderedMath = doc.markText(fromTo.from, fromTo.to);
             });
           }
@@ -136,7 +136,7 @@ $$\sum^b_c a$$
           return;
         }
         processMath(range.from, range.to);
-        //unrenderedMath = false;
+        unrenderedMath = null;
       });
 
       doc.eachLine(processLine);
