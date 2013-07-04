@@ -15,8 +15,11 @@
       .cm-strong { font-size: 140%; }
     </style>
 
-    <script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
     <script type="text/javascript" src="file:///usr/share/javascript/mathjax/unpacked/MathJax.js?config=TeX-AMS_HTML"></script>
+    <script> MathJax || document.write(
+      '<script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"><\/script>');
+    </script>
+
     <script type="text/x-mathjax-config">
       MathJax.Hub.Config({
         tex2jax: {
@@ -29,8 +32,10 @@
 
     <!-- I'm a JS noob, so jQuery is my only hope of writing somewhat portable code ;-).
          Drop ".min" to get non-minified source for debugging. -->
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
     <script type="text/javascript" src="file:///usr/share/javascript/jquery/jquery.js"></script>
+    <script> jQuery || document.write(
+      '<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.1/jquery.min.js"><\/script>');
+    </script>
   </head>
   <body>
     <h1>attempt at CodeMirror + in-place MathJax</h1>
