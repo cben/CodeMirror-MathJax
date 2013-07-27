@@ -118,13 +118,15 @@ $$\sum^b_c a$$
         window.lll = line;
       });*/
 
-      editor.on("change", function processChange(doc, changeObj) {
+      // documents don't batch events
+      CodeMirror.on(doc, "change", function processChange(doc, changeObj) {
         console.log("change", changeObj);
         window.ccc = changeObj;
         // TODO: changeObj.{from,to} are pre-change coordinates.
         doc.eachLine(changeObj.from.line, changeObj.to.line + 1,
                      processLine);
-        if(changeObj.next) {
+        if('next' in changeObj) {
+          console.log("next")
           processChange(changeObj.next);
         }
       });
