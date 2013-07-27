@@ -118,7 +118,7 @@ $$\sum^b_c a$$
         window.lll = line;
       });*/
 
-      // documents don't batch events
+      // Documents don't batch "change" events, so should never have .next.
       CodeMirror.on(doc, "change", function processChange(doc, changeObj) {
         console.log("change", changeObj);
         window.ccc = changeObj;
@@ -127,8 +127,8 @@ $$\sum^b_c a$$
         doc.eachLine(changeObj.from.line,
                      changeObj.to.line + changeObj.text.length + 1,
                      processLine);
-        if('next' in changeObj) {
-          console.log("next")
+        if("next" in changeObj) {
+          alert("next");
           processChange(changeObj.next);
         }
       });
