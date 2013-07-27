@@ -104,9 +104,9 @@ $$\sum^b_c a$$
         var line = doc.getLineNumber(lineHandle);
         console.log("processLine", line, text);
 
-        var inline = /\$.+?\${1,2}/g; // TODO: tighten, \(..\) & \[..\]
+        var formula = /\$.+?\${1,2}/g; // TODO: tighten, \(..\) & \[..\]                                                                                                                                                                                                                                            
         var match;
-        while((match = inline.exec(text)) != null) {
+        while((match = formula.exec(text)) != null) {
           var fromCh = match.index;
           var toCh = fromCh + match[0].length;
           processMath({line: line, ch: fromCh}, {line: line, ch: toCh});
@@ -122,8 +122,10 @@ $$\sum^b_c a$$
       CodeMirror.on(doc, "change", function processChange(doc, changeObj) {
         console.log("change", changeObj);
         window.ccc = changeObj;
-        // TODO: changeObj.{from,to} are pre-change coordinates.
-        doc.eachLine(changeObj.from.line, changeObj.to.line + 1,
+        // changeObj.{from,to} are pre-change coordinates; adding text.length 
+        // (number of inserted lines) is a conservative(?) fix.
+        doc.eachLine(changeObj.from.line,
+                     changeObj.to.line + changeObj.text.length + 1,
                      processLine);
         if('next' in changeObj) {
           console.log("next")
