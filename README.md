@@ -9,10 +9,14 @@ Buggy and work-in-progress...
 
 After checking out, run this to materialize CodeMirror subdir:
 
-    git submodule init; git submodule update
+    git submodule update --init
 
 I'm directly working in `gh-pages` branch without a `master` branch,
 as that's the simplest thing that could possibly work;
 http://oli.jp/2011/github-pages-workflow/ lists several alternatives.
 
 TODO: learn about bower or other ways to manage local vs online deps.
+
+TODO: jquery as submodule won't work because it contains no directly usable .js 
+file and having to build it would interfere with running from github pages 
+directly (http://stackoverflow.com/q/13520870).
