@@ -12,7 +12,16 @@
     <style type="text/css">
       .CodeMirror { border: 1px solid silver; border-width: 1px 2px; }
       .CodeMirror { font-family: sans-serif; }
-      .cm-header { font-size: 150%; }
+      .cm-header { font-size: 150%; line-height: 200%; }
+
+      /* .MathJax-Display has built-in vertical margin: 1em.
+         Inline math has nothing but this looks too dense.
+
+         TODO: syntax highlight $...$ and style with same padding,
+         otherwise this creates vetical jitter.  (High formulas cause
+         this jitter anyway, but MathJax makes an effort for simple
+         formulas to fit in a normal line.) */
+      /* .MathJax { padding-top: 10%; padding-bottom: 10%; } */
     </style>
 
     <script type="text/javascript" src="file:///usr/share/javascript/mathjax/unpacked/MathJax.js?config=TeX-AMS_HTML"></script>
@@ -44,11 +53,14 @@
 
 **Bold** and *italic* text in a normal paragraph.
 
-Foo $\sum^y_z x$ bar.
-
+**Bold** text in a normal-size paragraph.
+xXxXxXxXxXxXxXxXxXxXxXxX
+Foo $\sum^y_z \frac{1}{x}$ bar.
+xXxXxXxXxXxXxXxXxXxXxXxX
 ## A Second Level Header
-
-$$\sum^b_c a$$
+xXxXxXxXxXxXxXxXxXxXxXxX
+$$\sum^b_c \frac{1}{a}$$
+xXxXxXxXxXxXxXxXxXxXxXxX
 </textarea></form>
     <script id="script">
       "use strict";
