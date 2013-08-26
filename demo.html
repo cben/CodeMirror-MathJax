@@ -24,11 +24,7 @@
       /* .MathJax { padding-top: 10%; padding-bottom: 10%; } */
     </style>
 
-    <script type="text/javascript" src="file:///usr/share/javascript/mathjax/unpacked/MathJax.js?config=TeX-AMS_HTML"></script>
-    <script> window.MathJax || document.write(
-      '<script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"><\/script>');
-    </script>
-
+    <script src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
     <script type="text/x-mathjax-config">
       MathJax.Hub.Config({
         tex2jax: {
@@ -39,12 +35,9 @@
       });
     </script>
 
-    <!-- I'm a JS noob, so jQuery is my only hope of writing somewhat portable code ;-).
+    <!-- I'm a JS noob, so jQuery increases my chance to write somewhat portable code ;-).
          Drop ".min" to get non-minified source for debugging. -->
-    <script type="text/javascript" src="file:///usr/share/javascript/jquery/jquery.js"></script>
-    <script> window.jQuery || document.write(
-      '<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.1/jquery.min.js"><\/script>');
-    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
   </head>
   <body>
     <h1>attempt at CodeMirror + in-place MathJax</h1>
