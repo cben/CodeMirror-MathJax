@@ -3,9 +3,23 @@
 CodeMirror.renderMath = function(editor, MathJax) {
   var doc = editor.getDoc();
 
-  /* Return negative / 0 / positive. */
+  /* Return negative / 0 / positive.  a < b iff posCmp(a, b) < 0 etc. */
   function posCmp(a, b) {
-    return (b.line - a.line) || (b.ch - a.ch);
+    return (a.line - b.line) || (a.ch - b.ch);
+  }
+
+  function findMarksInRange(from, to) {
+    var allMarks = doc.getAllMarks();
+    var inRange = [];
+    for(var i = 0; i < allMarks.length; i++) {
+      var pos = allMarks[i].find();
+      /* Conservative: return marks with any overlap. */
+      if(posCmp(from, pos.to) <= 0 && posCmp(pos.from, to) <= 0) {
+        inRange.push(allMarks[i]);
+      }
+    }
+    console.log("allMarks", allMarks.length, "between", from, to, inRange);
+    return inRange;
   }
 
   /* If cursor is inside a formula, we don't render it until the
@@ -26,7 +40,7 @@ CodeMirror.renderMath = function(editor, MathJax) {
     MathJax.Hub.Queue(function() {
       /* TODO: behavior during selection? */
       var cursor = doc.getCursor();
-      if(posCmp(from, cursor) > 0 && posCmp(cursor, to) > 0) {
+      if(posCmp(from, cursor) < 0 && posCmp(cursor, to) < 0) {
         /* TODO: what if unrenderedMath is already set? */
         unrenderedMath = doc.markText(from, to);
       } else {
@@ -64,6 +78,11 @@ CodeMirror.renderMath = function(editor, MathJax) {
     window.ccc = changeObj;
     /* changeObj.{from,to} are pre-change coordinates; adding text.length
        (number of inserted lines) is a conservative(?) fix. */
+    var oldMarks = findMarksInRange({line: changeObj.from.line, ch: 0},
+                                    {line: changeObj.to.line + changeObj.text.length + 1, ch: 0});
+    for(var i = 0; i < oldMarks.length; i++) {
+      oldMarks[i].clear();
+    }
     doc.eachLine(changeObj.from.line,
                  changeObj.to.line + changeObj.text.length + 1,
                  processLine);
@@ -81,7 +100,7 @@ CodeMirror.renderMath = function(editor, MathJax) {
     }
     var range = unrenderedMath.find();
     console.log("cursorActivity", cursor, range.from, range.to);
-    if(posCmp(range.from, cursor) > 0 && posCmp(cursor, range.to) > 0) {
+    if(posCmp(range.from, cursor) < 0 && posCmp(cursor, range.to) < 0) {
       return;
     }
     processMath(range.from, range.to);
