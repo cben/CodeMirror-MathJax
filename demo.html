@@ -10,8 +10,21 @@
 
     <link rel="stylesheet" href="CodeMirror/lib/codemirror.css">
     <style type="text/css">
-      .CodeMirror { border: 1px solid silver; border-width: 1px 2px; }
-      .CodeMirror { font-family: sans-serif; }
+      /* Expand editor to fit most of the page. */
+      html, body, form, textarea, .CodeMirror {
+        height: 100%; width: 100%;
+        -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+      }
+      /* TODO: downsizing body is ugly but works better than downsizing form. */
+      body { height: 80%; width: 95%; }
+      /* These would make the editor exactly fill the available space,
+         but also cause CM to auto-resize and never scroll
+         (instead whole page scrolls), which makes CM slower.
+        body { display: table; }
+        form { display: table-row; } */
+
+      .CodeMirror { border: 1px solid silver; }
+      .CodeMirror { font-family: serif; }
       .cm-header { font-size: 150%; line-height: 200%; }
 
       /* .MathJax-Display has built-in vertical margin: 1em.
@@ -42,15 +55,13 @@
   <body>
     <h1>attempt at CodeMirror + in-place MathJax</h1>
 
-    <form><textarea id="code" name="code"># A First Level Header
-xXxXxXxXxXxXxXxXxXxXxXxX
-**Bold** and *italic* text in a normal line that is long enough to wrap, long enough to wrap, long enough to wrap, long enough to wrap.
+    <form><textarea id="code"># Inline math
 xXxXxXxXxXxXxXxXxXxXxXxX
 Normal-size line with $n$ compact formulas: $\sin x$.
 xXxXxXxXxXxXxXxXxXxXxXxX
 Foo $\sum^y_z \frac{1}{x}$ bar.
 xXxXxXxXxXxXxXxXxXxXxXxX
-## A Second Level Header
+# Display math
 xXxXxXxXxXxXxXxXxXxXxXxX
 $$\sum^b_c \frac{1}{a}$$
 xXxXxXxXxXxXxXxXxXxXxXxX
