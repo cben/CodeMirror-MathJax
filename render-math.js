@@ -48,7 +48,8 @@ CodeMirror.renderMath = function(editor, MathJax) {
     var line = doc.getLineNumber(lineHandle);
     console.log("processLine", line, text);
 
-    var formula = /\$.+?\${1,2}/g; /* TODO: tighten, \(..\) & \[..\] */
+    /* TODO: matches inner $..$ in $$..$ etc.  JS has lookahead but not lookbehind. */
+    var formula = /\$\$.*?[^$\\]\$\$|\$.*?[^$\\]\$|\\\(.*?[^$\\]\\\)|\\\[.*?[^$\\]\\\]/g;
     var match;
     while((match = formula.exec(text)) != null) {
       var fromCh = match.index;
