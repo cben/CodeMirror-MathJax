@@ -1,6 +1,6 @@
 "use strict";
 
-CodeMirror.renderMath = function(editor, MathJax, jQuery) {
+CodeMirror.renderMath = function(editor, MathJax) {
   var doc = editor.getDoc();
 
   /* Return negative / 0 / positive. */
@@ -16,7 +16,9 @@ CodeMirror.renderMath = function(editor, MathJax, jQuery) {
 
   function processMath(from, to) {
     var text = editor.getRange(from, to);
-    var elem = jQuery("<span>").text(text)[0];
+    var elem = document.createElement("span");
+    elem.appendChild(document.createTextNode(text));
+
     var cursor = doc.getCursor();
     console.log("processMath", text, elem,
                 posCmp(from, cursor), posCmp(cursor, to));

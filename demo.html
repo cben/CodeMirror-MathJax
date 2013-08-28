@@ -47,10 +47,6 @@
         },
       });
     </script>
-
-    <!-- I'm a JS noob, so jQuery increases my chance to write somewhat portable code ;-).
-         Drop ".min" to get non-minified source for debugging. -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
   </head>
   <body>
     <h1>attempt at CodeMirror + in-place MathJax</h1>
@@ -68,11 +64,11 @@ xXxXxXxXxXxXxXxXxXxXxXxX
 </textarea></form>
     <script>
       var editor = CodeMirror.fromTextArea(document.getElementById("code"),
-					   {lineNumbers: true,
-					    lineWrapping: true,
-					    mode: {name: "markdown",
-						   underscoresBreakWords: false}});
-      CodeMirror.renderMath(editor, MathJax, jQuery);
+                                           {lineNumbers: true,
+                                            lineWrapping: true,
+                                            mode: {name: "markdown",
+                                                   underscoresBreakWords: false}});
+      CodeMirror.renderMath(editor, MathJax);
     </script>
   </body>
 </html>
