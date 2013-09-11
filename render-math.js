@@ -1,6 +1,11 @@
 "use strict";
 
 CodeMirror.renderMath = function(editor, MathJax) {
+  // Prevent errors on IE.  Might not actually log.
+  function log() {
+    try { console.log.apply(console, arguments); } catch (err) {}
+  }
+
   var doc = editor.getDoc();
 
   // Return negative / 0 / positive.  a < b iff posCmp(a, b) < 0 etc.
@@ -18,7 +23,7 @@ CodeMirror.renderMath = function(editor, MathJax) {
         inRange.push(allMarks[i]);
       }
     }
-    console.log("allMarks", allMarks.length, "between", from, to, inRange);
+    log("allMarks", allMarks.length, "between", from, to, inRange);
     return inRange;
   }
 
@@ -34,8 +39,8 @@ CodeMirror.renderMath = function(editor, MathJax) {
     elem.appendChild(document.createTextNode(text));
 
     var cursor = doc.getCursor();
-    console.log("processMath", text, elem,
-                posCmp(from, cursor), posCmp(cursor, to));
+    log("processMath", text, elem,
+        posCmp(from, cursor), posCmp(cursor, to));
     MathJax.Hub.Queue(["Typeset", MathJax.Hub, elem]);
     MathJax.Hub.Queue(function() {
       /* TODO: behavior during selection? */
@@ -48,7 +53,7 @@ CodeMirror.renderMath = function(editor, MathJax) {
                                             clearOnEnter: false});
         CodeMirror.on(range, "beforeCursorEnter", function() {
           var fromTo = range.find();
-          console.log("beforeCursorEnter", fromTo, range);
+          log("beforeCursorEnter", fromTo, range);
           range.clear();
           unrenderedMath = doc.markText(fromTo.from, fromTo.to);
         });
@@ -60,7 +65,7 @@ CodeMirror.renderMath = function(editor, MathJax) {
   function processLine(lineHandle) {
     var text = lineHandle.text;
     var line = doc.getLineNumber(lineHandle);
-    console.log("processLine", line, text);
+    log("processLine", line, text);
 
     // TODO: matches inner $..$ in $$..$ etc.
     // JS has lookahead but not lookbehind.
@@ -75,7 +80,7 @@ CodeMirror.renderMath = function(editor, MathJax) {
 
   // Documents don't batch "change" events, so should never have .next.
   CodeMirror.on(doc, "change", function processChange(doc, changeObj) {
-    console.log("change", changeObj);
+    log("change", changeObj);
     window.ccc = changeObj;
     // changeObj.{from,to} are pre-change coordinates; adding text.length
     // (number of inserted lines) is a conservative(?) fix.
@@ -100,7 +105,7 @@ CodeMirror.renderMath = function(editor, MathJax) {
       return;
     }
     var range = unrenderedMath.find();
-    console.log("cursorActivity", cursor, range.from, range.to);
+    log("cursorActivity", cursor, range.from, range.to);
     if(posCmp(range.from, cursor) < 0 && posCmp(cursor, range.to) < 0) {
       return;
     }
