@@ -13,17 +13,30 @@ CodeMirror.renderMath = function(editor, MathJax) {
     return (a.line - b.line) || (a.ch - b.ch);
   }
 
+  // True if inside, false if on edge.
+  function posInsideRange(pos, fromTo) {
+    return posCmp(fromTo.from, pos) < 0 && posCmp(pos, fromTo.to) < 0;
+  }
+
+  // True if there is at least one character in common, false if just touching.
+  function rangesOverlap(fromTo1, fromTo2) {
+    return (posCmp(fromTo1.from, fromTo2.to) < 0 &&
+            posCmp(fromTo2.from, fromTo1.to) < 0);
+  }
+
+  // TODO: add similar function to CodeMirror (can be more efficient).
+  // Conservative: return marks with at least 1 char overlap.
   function findMarksInRange(from, to) {
     var allMarks = doc.getAllMarks();
     var inRange = [];
     for(var i = 0; i < allMarks.length; i++) {
-      var pos = allMarks[i].find();
-      // Conservative: return marks with any overlap.
-      if(posCmp(from, pos.to) <= 0 && posCmp(pos.from, to) <= 0) {
+      var markRange = allMarks[i].find();
+      if(rangesOverlap(markRange, {from: from, to: to})) {
         inRange.push(allMarks[i]);
+        log("between", from, to, ":", editor.getRange(markRange.from, markRange.to));
       }
     }
-    log("allMarks", allMarks.length, "between", from, to, inRange);
+    log("allMarks", allMarks.length, "inRange", inRange.length);
     return inRange;
   }
 
@@ -45,7 +58,7 @@ CodeMirror.renderMath = function(editor, MathJax) {
     MathJax.Hub.Queue(function() {
       /* TODO: behavior during selection? */
       var cursor = doc.getCursor();
-      if(posCmp(from, cursor) < 0 && posCmp(cursor, to) < 0) {
+      if(posInsideRange(cursor, {from: from, to: to})) {
         /* TODO: what if unrenderedMath is already set? */
         unrenderedMath = doc.markText(from, to);
       } else {
@@ -106,7 +119,7 @@ CodeMirror.renderMath = function(editor, MathJax) {
     }
     var range = unrenderedMath.find();
     log("cursorActivity", cursor, range.from, range.to);
-    if(posCmp(range.from, cursor) < 0 && posCmp(cursor, range.to) < 0) {
+    if(posInsideRange(cursor, range)) {
       return;
     }
     processMath(range.from, range.to);
