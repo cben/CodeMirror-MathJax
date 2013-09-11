@@ -3,7 +3,7 @@
 CodeMirror.renderMath = function(editor, MathJax) {
   var doc = editor.getDoc();
 
-  /* Return negative / 0 / positive.  a < b iff posCmp(a, b) < 0 etc. */
+  // Return negative / 0 / positive.  a < b iff posCmp(a, b) < 0 etc.
   function posCmp(a, b) {
     return (a.line - b.line) || (a.ch - b.ch);
   }
@@ -13,7 +13,7 @@ CodeMirror.renderMath = function(editor, MathJax) {
     var inRange = [];
     for(var i = 0; i < allMarks.length; i++) {
       var pos = allMarks[i].find();
-      /* Conservative: return marks with any overlap. */
+      // Conservative: return marks with any overlap.
       if(posCmp(from, pos.to) <= 0 && posCmp(pos.from, to) <= 0) {
         inRange.push(allMarks[i]);
       }
@@ -22,10 +22,10 @@ CodeMirror.renderMath = function(editor, MathJax) {
     return inRange;
   }
 
-  /* If cursor is inside a formula, we don't render it until the
-     cursor leaves it.  To cleanly detect when that happens we
-     still markText() it but without replacedWith and store the
-     marker here. */
+  // If cursor is inside a formula, we don't render it until the
+  // cursor leaves it.  To cleanly detect when that happens we
+  // still markText() it but without replacedWith and store the
+  // marker here.
   var unrenderedMath = null;
 
   function processMath(from, to) {
@@ -56,13 +56,14 @@ CodeMirror.renderMath = function(editor, MathJax) {
     });
   }
 
-  /* TODO: multi line $...$. Needs an approach similar to overlay modes. */
+  // TODO: multi line $...$. Needs an approach similar to overlay modes.
   function processLine(lineHandle) {
     var text = lineHandle.text;
     var line = doc.getLineNumber(lineHandle);
     console.log("processLine", line, text);
 
-    /* TODO: matches inner $..$ in $$..$ etc.  JS has lookahead but not lookbehind. */
+    // TODO: matches inner $..$ in $$..$ etc.
+    // JS has lookahead but not lookbehind.
     var formula = /\$\$.*?[^$\\]\$\$|\$.*?[^$\\]\$|\\\(.*?[^$\\]\\\)|\\\[.*?[^$\\]\\\]/g;
     var match;
     while((match = formula.exec(text)) != null) {
@@ -72,12 +73,12 @@ CodeMirror.renderMath = function(editor, MathJax) {
     }
   }
 
-  /* Documents don't batch "change" events, so should never have .next. */
+  // Documents don't batch "change" events, so should never have .next.
   CodeMirror.on(doc, "change", function processChange(doc, changeObj) {
     console.log("change", changeObj);
     window.ccc = changeObj;
-    /* changeObj.{from,to} are pre-change coordinates; adding text.length
-       (number of inserted lines) is a conservative(?) fix. */
+    // changeObj.{from,to} are pre-change coordinates; adding text.length
+    // (number of inserted lines) is a conservative(?) fix.
     var oldMarks = findMarksInRange({line: changeObj.from.line, ch: 0},
                                     {line: changeObj.to.line + changeObj.text.length + 1, ch: 0});
     for(var i = 0; i < oldMarks.length; i++) {
@@ -93,7 +94,7 @@ CodeMirror.renderMath = function(editor, MathJax) {
   });
 
   editor.on("cursorActivity", function(doc) {
-    /* TODO: selection behavior? */
+    // TODO: selection behavior?
     var cursor = doc.getCursor();
     if (unrenderedMath == null) {
       return;
