@@ -26,15 +26,6 @@
       .CodeMirror { border: 1px solid silver; }
       .CodeMirror { font-family: serif; }
       .cm-header { font-size: 150%; line-height: 200%; }
-
-      /* .MathJax-Display has built-in vertical margin: 1em.
-         Inline math has nothing but this looks too dense.
-
-         TODO: syntax highlight $...$ and style with same padding,
-         otherwise this creates vetical jitter.  (High formulas cause
-         this jitter anyway, but MathJax makes an effort for simple
-         formulas to fit in a normal line.) */
-      /* .MathJax { padding-top: 10%; padding-bottom: 10%; } */
     </style>
 
     <script type="text/x-mathjax-config">
@@ -50,6 +41,7 @@
   </head>
   <body>
     <h1>attempt at CodeMirror + in-place MathJax</h1>
+    <a href="https://github.com/cben/CodeMirror-MathJax">Source on github</a>
 
     <form><textarea id="code" autofocus># Inline math $2^n$
 xXxXxXxXxXxXxXxXxXxXxXxX
