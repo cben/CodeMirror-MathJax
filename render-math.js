@@ -48,7 +48,10 @@ CodeMirror.renderMath = function(editor, MathJax) {
 
   function processMath(from, to) {
     var text = editor.getRange(from, to);
+    // TODO: is this stable given surrounding edits?
+    var className = "cm-" + editor.getTokenAt(from, true).type;
     var elem = document.createElement("span");
+    elem.className = className;
     elem.appendChild(document.createTextNode(text));
 
     var cursor = doc.getCursor();
