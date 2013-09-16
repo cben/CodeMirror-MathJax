@@ -67,7 +67,12 @@ CodeMirror.renderMath = function(editor, MathJax) {
   }
 
   function unrenderMark(mark) {
-    unrenderRange(mark.find());
+    var range = mark.find();
+    if(!range) {
+      error(mark, ".find() == undefined");
+    } else {
+      unrenderRange(range);
+    }
     mark.clear();
   }
 
@@ -76,6 +81,11 @@ CodeMirror.renderMath = function(editor, MathJax) {
       // TODO: selection behavior?
       var cursor = doc.getCursor();
       var unrenderedRange = unrenderedMath.find();
+      if(!unrenderedRange) {
+        // This happens, not yet sure when and if it's fine.
+        error(unrenderedMath, ".find() == undefined");
+        return;
+      }
       if(posInsideRange(cursor, unrenderedRange)) {
         log("cursorActivity", cursor, "in unrenderedRange", unrenderedRange);
       } else {
