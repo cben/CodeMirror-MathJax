@@ -5,8 +5,14 @@ CodeMirror.renderMath = function(editor, MathJax) {
   function log() {
     try { console.log.apply(console, arguments); } catch (err) {}
   }
+  function error() {
+    try { console.error.apply(console, arguments); } catch (err) {}
+  }
 
   var doc = editor.getDoc();
+
+  // Position arithmetic
+  // -------------------
 
   // Return negative / 0 / positive.  a < b iff posCmp(a, b) < 0 etc.
   function posCmp(a, b) {
@@ -40,11 +46,48 @@ CodeMirror.renderMath = function(editor, MathJax) {
     return inRange;
   }
 
+  // Track currently-edited formula
+  // ------------------------------
+  // TODO: refactor this to generic simulation of cursor leave events.
+
   // If cursor is inside a formula, we don't render it until the
   // cursor leaves it.  To cleanly detect when that happens we
   // still markText() it but without replacedWith and store the
   // marker here.
   var unrenderedMath = null;
+
+  function unrenderRange(fromTo) {
+    if(unrenderedMath) {
+      var range = unrenderedMath.find();
+      var text = doc.getRange(range.from, range.to);
+      error("overriding previous unrenderedMath:", text);
+    }
+    log("unrendering math", doc.getRange(fromTo.from, fromTo.to));
+    unrenderedMath = doc.markText(fromTo.from, fromTo.to);
+  }
+
+  function unrenderMark(mark) {
+    unrenderRange(mark.find());
+    mark.clear();
+  }
+
+  editor.on("cursorActivity", function(doc) {
+    if (unrenderedMath) {
+      // TODO: selection behavior?
+      var cursor = doc.getCursor();
+      var unrenderedRange = unrenderedMath.find();
+      if(posInsideRange(cursor, unrenderedRange)) {
+        log("cursorActivity", cursor, "in unrenderedRange", unrenderedRange);
+      } else {
+        log("cursorActivity", cursor, "left unrenderedRange.", unrenderedRange);
+        unrenderedMath = null;
+        processMath(unrenderedRange.from, unrenderedRange.to);
+      }
+    }
+  });
+
+  // Rendering on changes
+  // --------------------
 
   function processMath(from, to) {
     var text = doc.getRange(from, to);
@@ -57,29 +100,31 @@ CodeMirror.renderMath = function(editor, MathJax) {
     elem.appendChild(document.createTextNode(text));
 
     var cursor = doc.getCursor();
-    log("processMath", text, elem,
-        posCmp(from, cursor), posCmp(cursor, to));
+    log("typesetting", text, elem);
     MathJax.Hub.Queue(["Typeset", MathJax.Hub, elem]);
     MathJax.Hub.Queue(function() {
-      /* TODO: behavior during selection? */
+      // TODO: what if doc changed while MathJax was typesetting?
+      // TODO: behavior during selection?
       var cursor = doc.getCursor();
+
       if(posInsideRange(cursor, {from: from, to: to})) {
-        /* TODO: what if unrenderedMath is already set? */
-        unrenderedMath = doc.markText(from, to);
+        // This doesn't normally happen during editing, more likely
+        // during initial pass.
+        error(cursor);
+        unrenderRange({from: from, to: to});
       } else {
-        var range = doc.markText(from, to, {replacedWith: elem,
-                                            clearOnEnter: false});
-        CodeMirror.on(range, "beforeCursorEnter", function() {
-          var fromTo = range.find();
-          log("beforeCursorEnter", fromTo, range);
-          range.clear();
-          unrenderedMath = doc.markText(fromTo.from, fromTo.to);
+        var mark = doc.markText(from, to, {replacedWith: elem,
+                                           clearOnEnter: false,
+                                           // title is supported since CM 3.15
+                                           title: text + " [click to edit]"});
+        CodeMirror.on(mark, "beforeCursorEnter", function() {
+          unrenderMark(mark);
         });
       }
     });
   }
 
-  // TODO: multi line $...$. Needs an approach similar to overlay modes.
+  // TODO: multi line \[...\]. Needs an approach similar to overlay modes.
   function processLine(lineHandle) {
     var text = lineHandle.text;
     var line = doc.getLineNumber(lineHandle);
@@ -99,7 +144,6 @@ CodeMirror.renderMath = function(editor, MathJax) {
   // Documents don't batch "change" events, so should never have .next.
   CodeMirror.on(doc, "change", function processChange(doc, changeObj) {
     log("change", changeObj);
-    window.ccc = changeObj;
     // changeObj.{from,to} are pre-change coordinates; adding text.length
     // (number of inserted lines) is a conservative(?) fix.
     var oldMarks = findMarksInRange({line: changeObj.from.line, ch: 0},
@@ -111,25 +155,11 @@ CodeMirror.renderMath = function(editor, MathJax) {
                  changeObj.to.line + changeObj.text.length + 1,
                  processLine);
     if("next" in changeObj) {
-      alert("next");
+      error("next");
       processChange(changeObj.next);
     }
   });
 
-  editor.on("cursorActivity", function(doc) {
-    // TODO: selection behavior?
-    var cursor = doc.getCursor();
-    if (unrenderedMath == null) {
-      return;
-    }
-    var range = unrenderedMath.find();
-    log("cursorActivity", cursor, range.from, range.to);
-    if(posInsideRange(cursor, range)) {
-      return;
-    }
-    processMath(range.from, range.to);
-    unrenderedMath = null;
-  });
-
+  // First pass - process whole document.
   doc.eachLine(processLine);
 }
