@@ -58,9 +58,13 @@ CodeMirror.renderMath = function(editor, MathJax) {
 
   function unrenderRange(fromTo) {
     if(unrenderedMath) {
-      var range = unrenderedMath.find();
-      var text = doc.getRange(range.from, range.to);
-      error("overriding previous unrenderedMath:", text);
+      var oldRange = unrenderedMath.find();
+      if(oldRange) {
+        var text = doc.getRange(oldRange.from, oldRange.to);
+        error("overriding previous unrenderedMath:", text);
+      } else {
+        error("overriding unrenderedMath whose .find() == undefined", text);
+      }
     }
     log("unrendering math", doc.getRange(fromTo.from, fromTo.to));
     unrenderedMath = doc.markText(fromTo.from, fromTo.to);
@@ -69,7 +73,7 @@ CodeMirror.renderMath = function(editor, MathJax) {
   function unrenderMark(mark) {
     var range = mark.find();
     if(!range) {
-      error(mark, ".find() == undefined");
+      error(mark, "mark.find() == undefined");
     } else {
       unrenderRange(range);
     }
