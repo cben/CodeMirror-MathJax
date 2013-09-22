@@ -109,7 +109,7 @@ CodeMirror.renderMath = function(editor, MathJax) {
     // TODO: is this stable given surrounding edits?
     var tokenType = editor.getTokenAt(from, true).type;
     if(tokenType) {
-      elem.className = "cm-" + tokenType;
+      elem.className = "cm-" + tokenType.replace(/ +/g, " cm-");
     }
     elem.appendChild(document.createTextNode(text));
 
