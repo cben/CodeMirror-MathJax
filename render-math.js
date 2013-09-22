@@ -106,12 +106,18 @@ CodeMirror.renderMath = function(editor, MathJax) {
   function processMath(from, to) {
     var text = doc.getRange(from, to);
     var elem = document.createElement("span");
-    // TODO: is this stable given surrounding edits?
-    var tokenType = editor.getTokenAt(from, true).type;
+    elem.appendChild(document.createTextNode(text));
+
+    // TODO: style won't be stable given surrounding edits.
+    // This appears to work quite well but only because we're
+    // re-rendering too aggressively (e.g. one line below change)...
+    // Sample style one char into the formula, so because it's null at
+    // start of line.
+    var insideFormula = {line: from.line, ch: from.ch + 1}
+    var tokenType = editor.getTokenAt(insideFormula, true).type;
     if(tokenType) {
       elem.className = "cm-" + tokenType.replace(/ +/g, " cm-");
     }
-    elem.appendChild(document.createTextNode(text));
 
     var cursor = doc.getCursor();
     log("typesetting", text, elem);
