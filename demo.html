@@ -24,8 +24,11 @@
         form { display: table-row; } */
 
       .CodeMirror { border: 1px solid silver; }
+      /* Variable-width font to stress test layout. */
       .CodeMirror { font-family: serif; }
       .cm-header { font-size: 150%; line-height: 200%; }
+      /* markdown mode styles `...` and indented code blocks as "comment". */
+      .CodeMirror .cm-comment { font-family: monospace; }
     </style>
 
     <script type="text/x-mathjax-config">
@@ -49,6 +52,12 @@ Normal-size line with $n = 2$ compact formulas: $\sin x$.
 xXxXxXxXxXxXxXxXxXxXxXxX
 >> Foo \(\sum^y_z \frac{1}{x}\) bar.
 xXxXxXxXxXxXxXxXxXxXxXxX
+
+## In monospace
+    xXxXxXxXxXxXxXxXxXxXxXxX
+    >> Foo \(\sum^y_z \frac{1}{x}\) bar.
+    xXxXxXxXxXxXxXxXxXxXxXxX
+
 # Display math
 > xXxXxXxXxXxXxXxXxXxXxXxX
 $$\sum^b_c \frac{1}{a}$$
