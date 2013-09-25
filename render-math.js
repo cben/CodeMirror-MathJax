@@ -115,9 +115,11 @@ CodeMirror.renderMath = function(editor, MathJax) {
     // start of line.
     var insideFormula = {line: from.line, ch: from.ch + 1}
     var tokenType = editor.getTokenAt(insideFormula, true).type;
+    var className = "math";     // TODO: configurable?
     if(tokenType) {
-      elem.className = "cm-" + tokenType.replace(/ +/g, " cm-");
+      className += " cm-" + tokenType.replace(/ +/g, " cm-");
     }
+    elem.className = className;
 
     var cursor = doc.getCursor();
     log("typesetting", text, elem);

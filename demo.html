@@ -29,6 +29,9 @@
       .cm-header { font-size: 150%; line-height: 200%; }
       /* markdown mode styles `...` and indented code blocks as "comment". */
       .CodeMirror .cm-comment { font-family: monospace; }
+      /* exclude math from monospace style to avoid mathjax vertically
+         squishing formulas, especially display. */
+      .CodeMirror .math.cm-comment { font-family: serif; }
     </style>
 
     <script type="text/x-mathjax-config">
