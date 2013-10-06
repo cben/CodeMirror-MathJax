@@ -14,6 +14,8 @@ CodeMirror.renderMath = function(editor, MathJax) {
   // Position arithmetic
   // -------------------
 
+  var Pos = CodeMirror.Pos;
+
   // Return negative / 0 / positive.  a < b iff posCmp(a, b) < 0 etc.
   function posCmp(a, b) {
     return (a.line - b.line) || (a.ch - b.ch);
@@ -113,7 +115,7 @@ CodeMirror.renderMath = function(editor, MathJax) {
     // re-rendering too aggressively (e.g. one line below change)...
     // Sample style one char into the formula, so because it's null at
     // start of line.
-    var insideFormula = {line: from.line, ch: from.ch + 1}
+    var insideFormula = Pos(from.line, from.ch + 1)
     var tokenType = editor.getTokenAt(insideFormula, true).type;
     var className = "math";     // TODO: configurable?
     if(tokenType) {
@@ -159,7 +161,7 @@ CodeMirror.renderMath = function(editor, MathJax) {
     while((match = formula.exec(text)) != null) {
       var fromCh = match.index;
       var toCh = fromCh + match[0].length;
-      processMath({line: line, ch: fromCh}, {line: line, ch: toCh});
+      processMath(Pos(line, fromCh), Pos(line, toCh));
     }
   }
 
@@ -168,8 +170,8 @@ CodeMirror.renderMath = function(editor, MathJax) {
     log("change", changeObj);
     // changeObj.{from,to} are pre-change coordinates; adding text.length
     // (number of inserted lines) is a conservative(?) fix.
-    var oldMarks = findMarksInRange({line: changeObj.from.line, ch: 0},
-                                    {line: changeObj.to.line + changeObj.text.length + 1, ch: 0});
+    var oldMarks = findMarksInRange(Pos(changeObj.from.line, 0),
+                                    Pos(changeObj.to.line + changeObj.text.length + 1, 0));
     for(var i = 0; i < oldMarks.length; i++) {
       oldMarks[i].clear();
     }
