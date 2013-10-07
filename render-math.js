@@ -105,28 +105,34 @@ CodeMirror.renderMath = function(editor, MathJax) {
   // Rendering on changes
   // --------------------
 
-  function processMath(from, to) {
+  function createMathElement(from, to) {
+    // TODO: would MathJax.HTML make this more portable?
     var text = doc.getRange(from, to);
     var elem = document.createElement("span");
     // Display math becomes a <div> (inside this <span>), which
     // confuses CM badly ("DOM node must be an inline element").
     elem.style.display = "inline-block";
     elem.appendChild(document.createTextNode(text));
+    elem.title = text;
 
     // TODO: style won't be stable given surrounding edits.
-    // This appears to work quite well but only because we're
+    // This appears to work somewhat well but only because we're
     // re-rendering too aggressively (e.g. one line below change)...
-    // Sample style one char into the formula, so because it's null at
+
+    // Sample style one char into the formula, because it's null at
     // start of line.
-    var insideFormula = Pos(from.line, from.ch + 1)
+    var insideFormula = Pos(from.line, from.ch + 1);
     var tokenType = editor.getTokenAt(insideFormula, true).type;
     var className = "math";     // TODO: configurable?
     if(tokenType) {
       className += " cm-" + tokenType.replace(/ +/g, " cm-");
     }
     elem.className = className;
+    return elem;
+  }
 
-    var cursor = doc.getCursor();
+  function processMath(from, to) {
+    var elem = createMathElement(from, to);
     log("typesetting", text, elem);
     MathJax.Hub.Queue(["Typeset", MathJax.Hub, elem]);
     MathJax.Hub.Queue(function() {
@@ -141,16 +147,13 @@ CodeMirror.renderMath = function(editor, MathJax) {
         unrenderRange({from: from, to: to});
       } else {
         var mark = doc.markText(from, to, {replacedWith: elem,
-                                           clearOnEnter: false,
-                                           // title is supported since CM 3.15
-                                           title: text + " [click to edit]"});
+                                           clearOnEnter: false});
         CodeMirror.on(mark, "beforeCursorEnter", function() {
           unrenderMark(mark);
         });
       }
     });
   }
-
   // TODO: multi line \[...\]. Needs an approach similar to overlay modes.
   function processLine(lineHandle) {
     var text = lineHandle.text;
