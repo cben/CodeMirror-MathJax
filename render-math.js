@@ -133,9 +133,11 @@ CodeMirror.renderMath = function(editor, MathJax) {
 
   function processMath(from, to) {
     var elem = createMathElement(from, to);
+    var text = elem.innerHTML;
     log("typesetting", text, elem);
     MathJax.Hub.Queue(["Typeset", MathJax.Hub, elem]);
     MathJax.Hub.Queue(function() {
+      log("done typesetting", text);
       // TODO: what if doc changed while MathJax was typesetting?
       // TODO: behavior during selection?
       var cursor = doc.getCursor();
