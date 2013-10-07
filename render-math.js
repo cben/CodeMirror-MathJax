@@ -108,6 +108,9 @@ CodeMirror.renderMath = function(editor, MathJax) {
   function processMath(from, to) {
     var text = doc.getRange(from, to);
     var elem = document.createElement("span");
+    // Display math becomes a <div> (inside this <span>), which
+    // confuses CM badly ("DOM node must be an inline element").
+    elem.style.display = "inline-block";
     elem.appendChild(document.createTextNode(text));
 
     // TODO: style won't be stable given surrounding edits.
