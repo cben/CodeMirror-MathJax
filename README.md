@@ -5,6 +5,8 @@ Buggy and work-in-progress...
 
 **Demo**: http://cben.github.io/CodeMirror-MathJax/demo.html
 
+If you just want to use this, check out [mathdown.net](http://mathdown.net).
+
 ## Git trivia
 
 After checking out, run this to materialize CodeMirror subdir:
