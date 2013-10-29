@@ -1,12 +1,24 @@
 "use strict";
 
 CodeMirror.renderMath = function(editor, MathJax) {
+  var timestamp = ((window.performance && window.performance.now) ?
+                   function() { return window.performance.now(); } :
+                   function() { return new Date().getTime(); });
+  var t0 = timestamp();
   // Prevent errors on IE.  Might not actually log.
   function log() {
-    try { console.log.apply(console, arguments); } catch (err) {}
+    try {
+      var args = Array.prototype.slice.call(arguments, 0);
+      args.unshift((timestamp() - t0).toFixed(0) + "ms");
+      console.log.apply(console, args);
+    } catch (err) {}
   }
   function error() {
-    try { console.error.apply(console, arguments); } catch (err) {}
+    try {
+      var args = Array.prototype.slice.call(arguments, 0);
+      args.unshift((timestamp() - t0).toFixed(0) + "ms");
+      console.error.apply(console, args);
+    } catch (err) {}
   }
 
   var doc = editor.getDoc();
