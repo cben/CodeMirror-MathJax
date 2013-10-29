@@ -168,6 +168,7 @@ CodeMirror.renderMath = function(editor, MathJax) {
       }
     });
   }
+
   // TODO: multi line \[...\]. Needs an approach similar to overlay modes.
   function processLine(lineHandle) {
     var text = lineHandle.text;
@@ -185,19 +186,21 @@ CodeMirror.renderMath = function(editor, MathJax) {
     }
   }
 
+  function clearMarksInRange(from, to) {
+    var oldMarks = findMarksInRange(from, to);
+    for(var i = 0; i < oldMarks.length; i++) {
+      oldMarks[i].clear();
+    }
+  }
+
   // Documents don't batch "change" events, so should never have .next.
   CodeMirror.on(doc, "change", function processChange(doc, changeObj) {
     log("change", changeObj);
     // changeObj.{from,to} are pre-change coordinates; adding text.length
     // (number of inserted lines) is a conservative(?) fix.
-    var oldMarks = findMarksInRange(Pos(changeObj.from.line, 0),
-                                    Pos(changeObj.to.line + changeObj.text.length + 1, 0));
-    for(var i = 0; i < oldMarks.length; i++) {
-      oldMarks[i].clear();
-    }
-    doc.eachLine(changeObj.from.line,
-                 changeObj.to.line + changeObj.text.length + 1,
-                 processLine);
+    var endLine = changeObj.to.line + changeObj.text.length + 1;
+    clearMarksInRange(Pos(changeObj.from.line, 0), Pos(endLine, 0));
+    doc.eachLine(changeObj.from.line, endLine, processLine);
     if("next" in changeObj) {
       error("next");
       processChange(changeObj.next);
