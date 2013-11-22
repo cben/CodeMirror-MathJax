@@ -1,6 +1,32 @@
+// dependencies:
+//   defineMathMode(): addon/mode/multiplex.js, optionally addon/mode/multiplex.js
+//   renderMath(): MathJax
+
 "use strict";
 
+// Wrap mode to skip formulas (e.g. $x*y$ shouldn't start italics in markdown).
+// TODO: doesn't handle escaping, e.g. \$.  Doesn't check spaces before/after $ like pandoc.
+// TODO: this might not exactly match the same things as formulaRE in renderMath().
+
+// We can't just construct a mode object, because there would be no
+// way to use; we have to register a constructor, with a name.
+CodeMirror.defineMathMode = function(name, outerModeSpec) {
+  CodeMirror.defineMode(name, function(cmConfig) {
+    var outerMode = CodeMirror.getMode(cmConfig, outerModeSpec);
+    var innerMode = CodeMirror.getMode(cmConfig, "text/x-stex");
+    return CodeMirror.multiplexingMode(
+      outerMode,
+      // "keyword" is how stex styles math delimiters.
+      {open: "$$", close: "$$", mode: innerMode, delimStyle: "keyword"},
+      {open:  "$", close: "$",  mode: innerMode, delimStyle: "keyword"},
+      {open: "\(", close: "\)", mode: innerMode, delimStyle: "keyword"},
+      {open: "\[", close: "\]", mode: innerMode, delimStyle: "keyword"});
+  });
+};
+
 CodeMirror.renderMath = function(editor, MathJax) {
+  // Logging
+  // -------
   var timestamp = ((window.performance && window.performance.now) ?
                    function() { return window.performance.now(); } :
                    function() { return new Date().getTime(); });
@@ -175,11 +201,12 @@ CodeMirror.renderMath = function(editor, MathJax) {
     var line = doc.getLineNumber(lineHandle);
     log("processLine", line, text);
 
+    // TODO: doesn't handle escaping, e.g. \$.  Doesn't check spaces before/after $ like pandoc.
     // TODO: matches inner $..$ in $$..$ etc.
     // JS has lookahead but not lookbehind.
-    var formula = /\$\$.*?[^$\\]\$\$|\$.*?[^$\\]\$|\\\(.*?[^$\\]\\\)|\\\[.*?[^$\\]\\\]/g;
+    var formulaRE = /\$\$.*?[^$\\]\$\$|\$.*?[^$\\]\$|\\\(.*?[^$\\]\\\)|\\\[.*?[^$\\]\\\]/g;
     var match;
-    while((match = formula.exec(text)) != null) {
+    while((match = formulaRE.exec(text)) != null) {
       var fromCh = match.index;
       var toCh = fromCh + match[0].length;
       processMath(Pos(line, fromCh), Pos(line, toCh));
