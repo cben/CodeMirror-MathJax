@@ -30,7 +30,16 @@
       .CodeMirror { border: 1px solid silver; }
       /* Variable-width font to stress test layout. */
       .CodeMirror { font-family: serif; }
-      .cm-header { font-size: 150%; line-height: 200%; }
+
+      /* Fallback for CodeMirror < 3.20 that doesn't emit cm-header1..6. */
+      XX.cm-header { font-size: 1.5em; }
+      /* Match h1..h6 default sizes in WebKit, Mozilla & IE as of 2013. */
+      .cm-header.cm-header1 { font-size: 2em; }
+      .cm-header.cm-header2 { font-size: 1.5em; }
+      .cm-header.cm-header3 { font-size: 1.17em; }
+      .cm-header.cm-header4 { font-size: 1em; }
+      .cm-header.cm-header5 { font-size: .83em; }
+      .cm-header.cm-header6 { font-size: .67em; }
       /* markdown mode styles `...` and indented code blocks as "comment". */
       .CodeMirror .cm-comment { font-family: monospace; }
       /* exclude math from monospace style to avoid mathjax vertically
