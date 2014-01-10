@@ -1,5 +1,5 @@
 // dependencies:
-//   defineMathMode(): addon/mode/multiplex.js, optionally addon/mode/multiplex.js
+//   defineMathMode(): addon/mode/multiplex.js, optionally addon/mode/stex/stex.js
 //   renderMath(): MathJax
 
 "use strict";
