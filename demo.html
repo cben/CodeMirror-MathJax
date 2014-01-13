@@ -94,7 +94,8 @@ xXxXxXxXxXxXxXxXxXxXxXxX
                                            {lineNumbers: true,
                                             lineWrapping: true,
                                             mode: "markdown+math"});
-      CodeMirror.renderMath(editor, MathJax);
+      CodeMirror.hookMath(editor, MathJax);
+      editor.renderAllMath();
     </script>
   </body>
 </html>

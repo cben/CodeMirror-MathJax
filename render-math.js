@@ -1,12 +1,12 @@
 // dependencies:
 //   defineMathMode(): addon/mode/multiplex.js, optionally addon/mode/stex/stex.js
-//   renderMath(): MathJax
+//   hookMath(): MathJax
 
 "use strict";
 
 // Wrap mode to skip formulas (e.g. $x*y$ shouldn't start italics in markdown).
 // TODO: doesn't handle escaping, e.g. \$.  Doesn't check spaces before/after $ like pandoc.
-// TODO: this might not exactly match the same things as formulaRE in renderMath().
+// TODO: this might not exactly match the same things as formulaRE in processLine().
 
 // We can't just construct a mode object, because there would be no
 // way to use; we have to register a constructor, with a name.
@@ -24,27 +24,44 @@ CodeMirror.defineMathMode = function(name, outerModeSpec) {
   });
 };
 
-CodeMirror.renderMath = function(editor, MathJax) {
+// Usage: first call CodeMirror.hookMath(editor, MathJax), then editor.renderAllMath() to process initial content.
+// TODO: simplify usage when initial pass becomes cheap.
+// TODO: use defineOption(), support clearing widgets and removing handlers.
+CodeMirror.hookMath = function(editor, MathJax) {
   // Logging
   // -------
-  var timestamp = ((window.performance && window.performance.now) ?
-                   function() { return window.performance.now(); } :
-                   function() { return new Date().getTime(); });
-  var t0 = timestamp();
-  // Prevent errors on IE.  Might not actually log.
+  var timestampMs = ((window.performance && window.performance.now) ?
+                     function() { return window.performance.now(); } :
+                     function() { return new Date().getTime(); });
+  function formatDuration(ms) { return (ms / 1000).toFixed(3) + "s"; }
+  
+  var t0 = timestampMs();
+  // Goal: Prevent errors on IE.  Might not actually log.
   function log() {
     try {
       var args = Array.prototype.slice.call(arguments, 0);
-      args.unshift((timestamp() - t0).toFixed(0) + "ms");
+      args.unshift(formatDuration(timestampMs() - t0));
       console.log.apply(console, args);
     } catch (err) {}
   }
   function error() {
     try {
       var args = Array.prototype.slice.call(arguments, 0);
-      args.unshift((timestamp() - t0).toFixed(0) + "ms");
+      args.unshift(formatDuration(timestampMs() - t0));
       console.error.apply(console, args);
     } catch (err) {}
+  }
+
+  // Log time if non-negligible.
+  function logFuncTime(func) {
+    return function() {
+      var start = timestampMs();
+      func.apply(this, arguments);
+      var duration = timestampMs() - start;
+      if(duration > 1000) {
+        log((func.name || "<???>") + "() took " + formatDuration(duration));
+      }
+    };
   }
 
   var doc = editor.getDoc();
@@ -72,6 +89,7 @@ CodeMirror.renderMath = function(editor, MathJax) {
 
   // TODO: add similar function to CodeMirror (can be more efficient).
   // Conservative: return marks with at least 1 char overlap.
+  // TODO: use changeEnd()
   function findMarksInRange(from, to) {
     var allMarks = doc.getAllMarks();
     var inRange = [];
@@ -221,7 +239,7 @@ CodeMirror.renderMath = function(editor, MathJax) {
   }
 
   // Documents don't batch "change" events, so should never have .next.
-  CodeMirror.on(doc, "change", function processChange(doc, changeObj) {
+  CodeMirror.on(doc, "change", logFuncTime(function processChange(doc, changeObj) {
     log("change", changeObj);
     // changeObj.{from,to} are pre-change coordinates; adding text.length
     // (number of inserted lines) is a conservative(?) fix.
@@ -232,8 +250,10 @@ CodeMirror.renderMath = function(editor, MathJax) {
       error("next");
       processChange(changeObj.next);
     }
-  });
+  }));
 
   // First pass - process whole document.
-  doc.eachLine(processLine);
+  editor.renderAllMath = logFuncTime(function renderAllMath() {
+    doc.eachLine(processLine);
+  })
 }
