@@ -19,8 +19,8 @@ CodeMirror.defineMathMode = function(name, outerModeSpec) {
       // "keyword" is how stex styles math delimiters.
       {open: "$$", close: "$$", mode: innerMode, delimStyle: "keyword"},
       {open:  "$", close: "$",  mode: innerMode, delimStyle: "keyword"},
-      {open: "\(", close: "\)", mode: innerMode, delimStyle: "keyword"},
-      {open: "\[", close: "\]", mode: innerMode, delimStyle: "keyword"});
+      {open: "\\(", close: "\\)", mode: innerMode, delimStyle: "keyword"},
+      {open: "\\[", close: "\\]", mode: innerMode, delimStyle: "keyword"});
   });
 };
 
