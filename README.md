@@ -3,9 +3,12 @@
 Experimenting to replace $math$ with formulas in CodeMirror.
 Buggy and work-in-progress...
 
-**Demo**: http://cben.github.io/CodeMirror-MathJax/demo.html
+## Demo
 
-If you just want to use this, check out [mathdown.net](http://mathdown.net).
+- CodeMirror v3: http://cben.github.io/CodeMirror-MathJax/demo.html
+- CodeMirror v4: http://cben.github.io/CodeMirror-MathJax/demo-v4.html
+
+If you just want to use this for writing, check out [mathdown.net](http://mathdown.net).
 
 ## Git trivia
 

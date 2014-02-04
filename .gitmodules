@@ -1,3 +1,8 @@
 [submodule "CodeMirror"]
 	path = CodeMirror
 	url = https://github.com/marijnh/CodeMirror
+	branch = master
+[submodule "CodeMirror-v4"]
+	path = CodeMirror-v4
+	url = https://github.com/marijnh/CodeMirror
+	branch = v4
