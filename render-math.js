@@ -217,7 +217,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
   function processLine(lineHandle) {
     var text = lineHandle.text;
     var line = doc.getLineNumber(lineHandle);
-    log("processLine", line, text);
+    //log("processLine", line, text);
 
     // TODO: doesn't handle escaping, e.g. \$.  Doesn't check spaces before/after $ like pandoc.
     // TODO: matches inner $..$ in $$..$ etc.
@@ -255,5 +255,6 @@ CodeMirror.hookMath = function(editor, MathJax) {
   // First pass - process whole document.
   editor.renderAllMath = logFuncTime(function renderAllMath() {
     doc.eachLine(processLine);
+    MathJax.Hub.Queue(function() { log("-- All math rendered. --"); });
   })
 }
