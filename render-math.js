@@ -168,6 +168,10 @@ CodeMirror.hookMath = function(editor, MathJax) {
     // Display math becomes a <div> (inside this <span>), which
     // confuses CM badly ("DOM node must be an inline element").
     elem.style.display = "inline-block";
+    if(/\\(?:re)?newcommand/.test(text)) {
+      // \newcommand{...} would render empty, which makes it hard to enter it for editing.
+      text = text + " \\(" + text + "\\)";
+    }
     elem.appendChild(document.createTextNode(text));
     elem.title = text;
 
@@ -222,7 +226,8 @@ CodeMirror.hookMath = function(editor, MathJax) {
     // TODO: doesn't handle escaping, e.g. \$.  Doesn't check spaces before/after $ like pandoc.
     // TODO: matches inner $..$ in $$..$ etc.
     // JS has lookahead but not lookbehind.
-    var formulaRE = /\$\$.*?[^$\\]\$\$|\$.*?[^$\\]\$|\\\(.*?[^$\\]\\\)|\\\[.*?[^$\\]\\\]/g;
+    // For \newcommand{...} can't match end reliably, just consume till last } on line.
+    var formulaRE = /\$\$.*?[^$\\]\$\$|\$.*?[^$\\]\$|\\\(.*?[^$\\]\\\)|\\\[.*?[^$\\]\\\]|\\begin\{(\w+)\}.*?\\end{\1}|\\(?:re)?newcommand\{.*\}/g;
     var match;
     while((match = formulaRE.exec(text)) != null) {
       var fromCh = match.index;
