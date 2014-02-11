@@ -55,7 +55,8 @@
           displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
           processEscapes: true
         },
-        TeX: { noErrors: { disabled: true } }
+        TeX: { noErrors: { disabled: true },
+               equationNumbers: { autoNumber: "AMS" } }
       });
     </script>
     <!-- Safe extension (http://docs.mathjax.org/en/latest/safe-mode.html)
@@ -79,9 +80,10 @@ xXxXxXxXxXxXxXxXxXxXxXxX
 > xXxXxXxXxXxXxXxXxXxXxXxX
 $$\sum^b_c \frac{1}{a}$$
 xXxXxXxXxXxXxXxXxXxXxXxX
+\begin{equation}\sum_{n=0}^\infty \frac{1}{n} = \infty\end{equation}  Bug: numbering is unusable, inrements with every edit.
 
 ## Maxwell's Equations
-\[ \begin{aligned}   \nabla \times \vec{\mathbf{B}} -\, \frac1c\, \frac{\partial\vec{\mathbf{E}}}{\partial t} & = \frac{4\pi}{c}\vec{\mathbf{j}} \\   \nabla \cdot \vec{\mathbf{E}} & = 4 \pi \rho \\   \nabla \times \vec{\mathbf{E}}\, +\, \frac1c\, \frac{\partial\vec{\mathbf{B}}}{\partial t} & = \vec{\mathbf{0}} \\   \nabla \cdot \vec{\mathbf{B}} & = 0 \end{aligned} \]
+\begin{aligned}   \nabla \times \vec{\mathbf{B}} -\, \frac1c\, \frac{\partial\vec{\mathbf{E}}}{\partial t} & = \frac{4\pi}{c}\vec{\mathbf{j}} \\   \nabla \cdot \vec{\mathbf{E}} & = 4 \pi \rho \\   \nabla \times \vec{\mathbf{E}}\, +\, \frac1c\, \frac{\partial\vec{\mathbf{B}}}{\partial t} & = \vec{\mathbf{0}} \\   \nabla \cdot \vec{\mathbf{B}} & = 0 \end{aligned}
 
 # In monospace
     xXxXxXxXxXxXxXxXxXxXxXxX
