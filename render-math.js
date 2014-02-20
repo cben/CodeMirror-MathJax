@@ -42,14 +42,14 @@ CodeMirror.hookMath = function(editor, MathJax) {
       var args = Array.prototype.slice.call(arguments, 0);
       args.unshift(formatDuration(timestampMs() - t0));
       console.log.apply(console, args);
-    } catch (err) {}
+    } catch(err) {}
   }
   function error() {
     try {
       var args = Array.prototype.slice.call(arguments, 0);
       args.unshift(formatDuration(timestampMs() - t0));
       console.error.apply(console, args);
-    } catch (err) {}
+    } catch(err) {}
   }
 
   // Log time if non-negligible.
@@ -58,7 +58,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
       var start = timestampMs();
       func.apply(this, arguments);
       var duration = timestampMs() - start;
-      if(duration > 1000) {
+      if(duration > 100) {
         log((func.name || "<???>") + "() took " + formatDuration(duration));
       }
     };
@@ -139,7 +139,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
   }
 
   editor.on("cursorActivity", function(doc) {
-    if (unrenderedMath) {
+    if(unrenderedMath) {
       // TODO: selection behavior?
       var cursor = doc.getCursor();
       var unrenderedRange = unrenderedMath.find();
