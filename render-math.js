@@ -191,6 +191,18 @@ CodeMirror.hookMath = function(editor, MathJax) {
     return elem;
   }
 
+  // MathJax returns rendered DOMs asynchroonously.
+  // Batch inserting those into the editor to reduce layout & painting.
+  var markTextQueue = [];
+  var flushMarkTextQueue = logFuncTime(function flushMarkTextQueue() {
+    editor.operation(function() {
+      for(var i = 0; i < markTextQueue.length; i++) {
+        markTextQueue[i]();
+      }
+      markTextQueue = [];
+    });
+  });
+
   function processMath(from, to) {
     var elem = createMathElement(from, to);
     var text = elem.innerHTML;
@@ -208,10 +220,12 @@ CodeMirror.hookMath = function(editor, MathJax) {
         error(cursor);
         unrenderRange({from: from, to: to});
       } else {
-        var mark = doc.markText(from, to, {replacedWith: elem,
-                                           clearOnEnter: false});
-        CodeMirror.on(mark, "beforeCursorEnter", function() {
-          unrenderMark(mark);
+        markTextQueue.push(function() {
+          var mark = doc.markText(from, to, {replacedWith: elem,
+                                             clearOnEnter: false});
+          CodeMirror.on(mark, "beforeCursorEnter", function() {
+            unrenderMark(mark);
+          });
         });
       }
     });
@@ -255,11 +269,21 @@ CodeMirror.hookMath = function(editor, MathJax) {
       error("next");
       processChange(changeObj.next);
     }
+    MathJax.Hub.Queue(flushMarkTextQueue);
   }));
 
   // First pass - process whole document.
   editor.renderAllMath = logFuncTime(function renderAllMath() {
     doc.eachLine(processLine);
+    MathJax.Hub.Queue(flushMarkTextQueue);
     MathJax.Hub.Queue(function() { log("-- All math rendered. --"); });
   })
+
+  // Make sure stuff doesn't somehow remain in markTextQueue.
+  setInterval(function() {
+    if(markTextQueue.length != 0) {
+      error("Fallaback flushMarkTextQueue:", markTextQueue.length, "elements");
+      flushMarkTextQueue();
+    }
+  }, 500);
 }
