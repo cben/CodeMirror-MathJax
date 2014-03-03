@@ -8,7 +8,7 @@ Buggy and work-in-progress...
 - CodeMirror v3: http://cben.github.io/CodeMirror-MathJax/demo.html
 - CodeMirror v4: http://cben.github.io/CodeMirror-MathJax/demo-v4.html
 
-If you just want to use this for writing, check out [mathdown.net](http://mathdown.net).
+If you just want to use this for writing, check out [mathdown.net](http://mathdown.net) powered by https://github.com/cben/mathdown.
 
 ## Git trivia
 
