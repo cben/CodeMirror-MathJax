@@ -137,6 +137,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
         log("cursorActivity", cursor, "left unrenderedRange.", unrenderedRange);
         unrenderedMath = null;
         processMath(unrenderedRange.from, unrenderedRange.to);
+        flushMarkTextQueue();
       }
     }
   });
