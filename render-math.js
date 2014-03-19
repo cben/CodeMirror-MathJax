@@ -87,23 +87,6 @@ CodeMirror.hookMath = function(editor, MathJax) {
             posCmp(fromTo2.from, fromTo1.to) < 0);
   }
 
-  // TODO: add similar function to CodeMirror (can be more efficient).
-  // Conservative: return marks with at least 1 char overlap.
-  // TODO: use changeEnd()
-  function findMarksInRange(from, to) {
-    var allMarks = doc.getAllMarks();
-    var inRange = [];
-    for(var i = 0; i < allMarks.length; i++) {
-      var markRange = allMarks[i].find();
-      if(rangesOverlap(markRange, {from: from, to: to})) {
-        inRange.push(allMarks[i]);
-        log("between", from, to, ":", editor.getRange(markRange.from, markRange.to));
-      }
-    }
-    log("allMarks", allMarks.length, "inRange", inRange.length);
-    return inRange;
-  }
-
   // Track currently-edited formula
   // ------------------------------
   // TODO: refactor this to generic simulation of cursor leave events.
@@ -251,9 +234,13 @@ CodeMirror.hookMath = function(editor, MathJax) {
   }
 
   function clearMarksInRange(from, to) {
-    var oldMarks = findMarksInRange(from, to);
+    // doc.findMarks() added in CM 3.22.
+    var oldMarks = doc.findMarks ? doc.findMarks(from, to) : doc.getAllMarks();
     for(var i = 0; i < oldMarks.length; i++) {
-      oldMarks[i].clear();
+      // findMarks() returns marks that touch the range, we want at least one char overlap.
+      if(rangesOverlap(oldMarks[i].find(), {from: from, to: to})) {
+        oldMarks[i].clear();
+      }
     }
   }
 
@@ -262,6 +249,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
     log("change", changeObj);
     // changeObj.{from,to} are pre-change coordinates; adding text.length
     // (number of inserted lines) is a conservative(?) fix.
+    // TODO: use cm.changeEnd()
     var endLine = changeObj.to.line + changeObj.text.length + 1;
     clearMarksInRange(Pos(changeObj.from.line, 0), Pos(endLine, 0));
     doc.eachLine(changeObj.from.line, endLine, processLine);
