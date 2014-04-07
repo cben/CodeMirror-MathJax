@@ -225,7 +225,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
     // TODO: matches inner $..$ in $$..$ etc.
     // JS has lookahead but not lookbehind.
     // For \newcommand{...} can't match end reliably, just consume till last } on line.
-    var formulaRE = /\$\$.*?[^$\\]\$\$|\$.*?[^$\\]\$|\\\(.*?[^$\\]\\\)|\\\[.*?[^$\\]\\\]|\\begin\{(\w+)\}.*?\\end{\1}|\\(?:re)?newcommand\{.*\}/g;
+    var formulaRE = /\$\$.*?[^$\\]\$\$|\$.*?[^$\\]\$|\\\(.*?[^$\\]\\\)|\\\[.*?[^$\\]\\\]|\\begin\{([*\w]+)\}.*?\\end{\1}|\\(?:re)?newcommand\{.*\}/g;
     var match;
     while((match = formulaRE.exec(text)) != null) {
       var fromCh = match.index;
