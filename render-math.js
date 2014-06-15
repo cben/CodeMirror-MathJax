@@ -17,10 +17,11 @@ CodeMirror.defineMathMode = function(name, outerModeSpec) {
     return CodeMirror.multiplexingMode(
       outerMode,
       // "keyword" is how stex styles math delimiters.
-      {open: "$$", close: "$$", mode: innerMode, delimStyle: "keyword"},
-      {open:  "$", close: "$",  mode: innerMode, delimStyle: "keyword"},
-      {open: "\\(", close: "\\)", mode: innerMode, delimStyle: "keyword"},
-      {open: "\\[", close: "\\]", mode: innerMode, delimStyle: "keyword"});
+      // "delim" tells us not to pick up this style as math style.
+      {open: "$$", close: "$$", mode: innerMode, delimStyle: "keyword delim"},
+      {open:  "$", close: "$",  mode: innerMode, delimStyle: "keyword delim"},
+      {open: "\\(", close: "\\)", mode: innerMode, delimStyle: "keyword delim"},
+      {open: "\\[", close: "\\]", mode: innerMode, delimStyle: "keyword delim"});
   });
 };
 
@@ -34,7 +35,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
                      function() { return window.performance.now(); } :
                      function() { return new Date().getTime(); });
   function formatDuration(ms) { return (ms / 1000).toFixed(3) + "s"; }
-  
+
   var t0 = timestampMs();
   // Goal: Prevent errors on IE.  Might not actually log.
   function log() {
@@ -168,7 +169,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
     var insideFormula = Pos(from.line, from.ch + 1);
     var tokenType = editor.getTokenAt(insideFormula, true).type;
     var className = "math";     // TODO: configurable?
-    if(tokenType) {
+    if(tokenType && !/delim/.test(tokenType)) {
       className += " cm-" + tokenType.replace(/ +/g, " cm-");
     }
     elem.className = className;
