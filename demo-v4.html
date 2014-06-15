@@ -45,7 +45,8 @@
       .CodeMirror .cm-comment { font-family: monospace; }
       /* exclude math from monospace style to avoid mathjax vertically
          squishing formulas, especially display. */
-      .CodeMirror .math.cm-comment { font-family: serif; }
+      .CodeMirror .cm-comment.inline_math, .cm-comment.display_math { font-family: serif; }
+      .display_math { width:100%; }
     </style>
 
     <script type="text/x-mathjax-config">
@@ -77,9 +78,8 @@ xXxXxXxXxXxXxXxXxXxXxXxX
 xXxXxXxXxXxXxXxXxXxXxXxX
 
 # Display math
-> xXxXxXxXxXxXxXxXxXxXxXxX
-$$\sum^b_c \frac{1}{a}$$
-xXxXxXxXxXxXxXxXxXxXxXxX
+The following `...xXx formula xXx...` are written on one line but the formula is displayed separately.
+> xXxXxXxXxXxXxXxXxXxXxXxX $$\sum^b_c \frac{1}{a}$$ xXxXxXxXxXxXxXxXxXxXxXxX
 \begin{equation}\sum_{n=0}^\infty \frac{1}{n} = \infty\end{equation}  Bug: numbering is unusable, inrements with every edit.
 
 ## Maxwell's Equations

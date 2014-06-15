@@ -160,6 +160,8 @@ CodeMirror.hookMath = function(editor, MathJax) {
     elem.appendChild(document.createTextNode(text));
     elem.title = text;
 
+    var isDisplay = /^\$\$|^\\\[|^\\begin/.test(text);  // TODO: probably imprecise.
+
     // TODO: style won't be stable given surrounding edits.
     // This appears to work somewhat well but only because we're
     // re-rendering too aggressively (e.g. one line below change)...
@@ -168,7 +170,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
     // start of line.
     var insideFormula = Pos(from.line, from.ch + 1);
     var tokenType = editor.getTokenAt(insideFormula, true).type;
-    var className = "math";     // TODO: configurable?
+    var className = isDisplay ? "display_math" : "inline_math";
     if(tokenType && !/delim/.test(tokenType)) {
       className += " cm-" + tokenType.replace(/ +/g, " cm-");
     }
