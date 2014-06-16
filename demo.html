@@ -42,10 +42,10 @@
       .cm-header.cm-header5, .cm-header.cm-header-5 { font-size: 0.83em; }
       .cm-header.cm-header6, .cm-header.cm-header-6 { font-size: 0.67em; }
       /* markdown mode styles `...` and indented code blocks as "comment". */
-      .CodeMirror .cm-comment { font-family: monospace; }
+      .cm-comment { font-family: monospace; }
       /* exclude math from monospace style to avoid mathjax vertically
          squishing formulas, especially display. */
-      .CodeMirror .cm-comment.inline_math, .cm-comment.display_math { font-family: serif; }
+      .cm-comment.inline_math, .cm-comment.display_math { font-family: serif; }
       .display_math { width:100%; }
     </style>
 
@@ -72,9 +72,9 @@
 
 # Inline math $a&lt;b&gt;c$
 > xXxXxXxXxXxXxXxXxXxXxXxX
-Normal-size line with $n = 2$ compact formulas: $\sin x$.
+      Normal-size line with $n = 2$ compact formulas: $x*y$.  There was a `*` in that formula but this text should not be italic.
 xXxXxXxXxXxXxXxXxXxXxXxX
->> Foo \(\sum^{y}_{z} \frac{1}{x}\) bar.  There was a `_` in that formula but this text should not be italic.
+>> Foo \(\sum^{y}_{z} \frac{1}{x}\) bar.
 xXxXxXxXxXxXxXxXxXxXxXxX
 
 # Display math

@@ -45,7 +45,7 @@
       .CodeMirror .cm-comment { font-family: monospace; }
       /* exclude math from monospace style to avoid mathjax vertically
          squishing formulas, especially display. */
-      .CodeMirror .cm-comment.inline_math, .cm-comment.display_math { font-family: serif; }
+      .CodeMirror .cm-comment.inline_math, .CodeMirror .cm-comment.display_math { font-family: serif; }
       .display_math { width:100%; }
     </style>
 
@@ -72,9 +72,9 @@
 
 # Inline math $a&lt;b&gt;c$
 > xXxXxXxXxXxXxXxXxXxXxXxX
-Normal-size line with $n = 2$ compact formulas: $\sin x$.
+      Normal-size line with $n = 2$ compact formulas: $x*y$.  There was a `*` in that formula but this text should not be italic.
 xXxXxXxXxXxXxXxXxXxXxXxX
->> Foo \(\sum^{y}_{z} \frac{1}{x}\) bar.  There was a `_` in that formula but this text should not be italic.
+>> Foo \(\sum^{y}_{z} \frac{1}{x}\) bar.
 xXxXxXxXxXxXxXxXxXxXxXxX
 
 # Display math
