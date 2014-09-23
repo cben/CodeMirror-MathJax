@@ -1,12 +1,13 @@
 # Attempt at CodeMirror + in-place MathJax
 
-Experimenting to replace $math$ with formulas in CodeMirror.
+Experimenting to replace $math$ (and related LaTeX syntaxes) with formulas in CodeMirror.
 Buggy and work-in-progress...
+
+Mostly tested with recend CodeMirror 4.x versions but probably works with any 3.x too (open a bug if not). 
 
 ## Demo
 
-- CodeMirror v3: http://cben.github.io/CodeMirror-MathJax/demo.html
-- CodeMirror v4: http://cben.github.io/CodeMirror-MathJax/demo-v4.html
+http://cben.github.io/CodeMirror-MathJax/demo.html
 
 If you just want to use this for writing, check out [mathdown.net](http://mathdown.net) powered by https://github.com/cben/mathdown.
 
