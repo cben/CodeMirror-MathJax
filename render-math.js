@@ -111,7 +111,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
     }
     log("unrendering math", doc.getRange(fromTo.from, fromTo.to));
     unrenderedMath = doc.markText(fromTo.from, fromTo.to);
-    mark.xMathState = "unrendered"; // helps later remove only our marks.
+    unrenderedMath.xMathState = "unrendered"; // helps later remove only our marks.
   }
 
   function unrenderMark(mark) {
