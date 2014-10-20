@@ -38,6 +38,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
 
   var t0 = timestampMs();
   // Goal: Prevent errors on IE.  Might not actually log.
+  // While we are at it, prepend timestamp to all messages.
   function log() {
     try {
       var args = Array.prototype.slice.call(arguments, 0);
@@ -110,6 +111,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
     }
     log("unrendering math", doc.getRange(fromTo.from, fromTo.to));
     unrenderedMath = doc.markText(fromTo.from, fromTo.to);
+    mark.xMathState = "unrendered"; // helps later remove only our marks.
   }
 
   function unrenderMark(mark) {
@@ -210,6 +212,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
         markTextQueue.push(function() {
           var mark = doc.markText(from, to, {replacedWith: elem,
                                              clearOnEnter: false});
+	  mark.xMathState = "rendered"; // helps later remove only our marks.
           CodeMirror.on(mark, "beforeCursorEnter", function() {
             unrenderMark(mark);
           });
@@ -237,13 +240,22 @@ CodeMirror.hookMath = function(editor, MathJax) {
     }
   }
 
-  function clearMarksInRange(from, to) {
+  function clearOurMarksInRange(from, to) {
     // doc.findMarks() added in CM 3.22.
     var oldMarks = doc.findMarks ? doc.findMarks(from, to) : doc.getAllMarks();
     for(var i = 0; i < oldMarks.length; i++) {
-      // findMarks() returns marks that touch the range, we want at least one char overlap.
-      if(rangesOverlap(oldMarks[i].find(), {from: from, to: to})) {
-        oldMarks[i].clear();
+      var mark = oldMarks[i];
+      if(mark.xMathState !== undefined) {
+	continue;
+      }
+
+      // Verify it's in range, even after findMarks() - it returns
+      // marks that touch the range, we want at least one char overlap.
+      var found = mark.find();
+      if(found.line ?
+	 /* bookmark */ posInsideRange(found, {from: from, to: to}) :
+	 /* marked range */ rangesOverlap(found, {from: from, to: to})) {
+          mark.clear();
       }
     }
   }
@@ -255,7 +267,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
     // (number of inserted lines) is a conservative(?) fix.
     // TODO: use cm.changeEnd()
     var endLine = changeObj.to.line + changeObj.text.length + 1;
-    clearMarksInRange(Pos(changeObj.from.line, 0), Pos(endLine, 0));
+    clearOurMarksInRange(Pos(changeObj.from.line, 0), Pos(endLine, 0));
     doc.eachLine(changeObj.from.line, endLine, processLine);
     if("next" in changeObj) {
       error("next");
