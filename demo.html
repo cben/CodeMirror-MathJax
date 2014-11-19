@@ -80,14 +80,30 @@ xXxXxXxXxXxXxXxXxXxXxXxX
 # Display math
 The following `...xXx formula xXx...` are written on one line but the formula is displayed separately.
 > xXxXxXxXxXxXxXxXxXxXxXxX $$\sum^b_c \frac{1}{a}$$ xXxXxXxXxXxXxXxXxXxXxXxX
-\begin{equation}\sum_{n=0}^\infty \frac{1}{n} = \infty\end{equation}  Bug: numbering is unusable, inrements with every edit.
 
 ## Maxwell's Equations
 \begin{aligned}   \nabla \times \vec{\mathbf{B}} -\, \frac1c\, \frac{\partial\vec{\mathbf{E}}}{\partial t} & = \frac{4\pi}{c}\vec{\mathbf{j}} \\   \nabla \cdot \vec{\mathbf{E}} & = 4 \pi \rho \\   \nabla \times \vec{\mathbf{E}}\, +\, \frac1c\, \frac{\partial\vec{\mathbf{B}}}{\partial t} & = \vec{\mathbf{0}} \\   \nabla \cdot \vec{\mathbf{B}} & = 0 \end{aligned}
 
+
+# Numbering — quite broken
+This demo has `autoNumber: "AMS"` in [MathJax config](http://docs.mathjax.org/en/latest/options/TeX.html),
+so `\begin{equation}` works at first glance — but it's pretty broken:
+
+$$\sum^b_c \frac{1}{a}$$
+> BUG: numbering is unusable, increments with every edit.
+
+This is a forward reference [$\ref{ref2}$] and another $\eqref{ref2}$ for the following equation:
+\begin{equation}x+1\over\sqrt{1-x^2}\label{ref2}\end{equation}
+This is a back reference [$\ref{ref2}$] and another $\eqref{ref2}$ for the  preceding equation.
+> minor BUG: `\ref` and `\eqref` are only recognized inside math.
+> BUG: labels are completely broken, result in error second time equation is typeset!
+
+\begin{align} x& = y_1-y_2+y_3-y_5+y_8-\dots && \text{by \eqref{ref1}}\\ & = y'\circ y^* && \text{(by \eqref{ref3})}\\ & = y(0) y' && \text {by Axiom 1.} \end{align}
+
 # Defining macros
 Define \foo: \newcommand{\foo}{f_0^0}
 Use \foo: $\foo$
+> BUG: definition changes don't trigger re-typesetting, but it's rare enough that refreshing the page is acceptable workaround.
 
 # In monospace
     xXxXxXxXxXxXxXxXxXxXxXxX
