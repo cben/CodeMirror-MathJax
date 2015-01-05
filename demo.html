@@ -57,7 +57,8 @@
           processEscapes: true
         },
         TeX: { noErrors: { disabled: true },
-               equationNumbers: { autoNumber: "AMS" } }
+               equationNumbers: { autoNumber: "AMS" },
+               extensions: ["autoload-all.js"] }
       });
     </script>
     <!-- Safe extension (http://docs.mathjax.org/en/latest/safe-mode.html)
@@ -76,6 +77,12 @@ Normal-size line with $n = 2$ compact formulas: $x*y$.  There was a `*` in that 
 xXxXxXxXxXxXxXxXxXxXxXxX
 >> Foo \(\sum^{y}_{z} \frac{1}{x}\) bar.
 xXxXxXxXxXxXxXxXxXxXxXxX
+
+## Misc MathJax extensions
+AMScd: $ \begin{CD} A @<<< B @>>> C\\ @. @| @AAA\\ @. D @= E \end{CD}$
+cancel: $ \cancelto{\cot}{\tan} \frac{A \bcancel{B}}{\bcancel{B} C} $
+mhchem: \( \ce{$A$ ->[\ce{+H2O}] $B$} \)
+*et cetera...*  (No thanks to this library, I simply enabled them in [MathJax config](http://docs.mathjax.org/en/latest/tex.html).)
 
 # Display math
 The following `...xXx formula xXx...` are written on one line but the formula is displayed separately.
