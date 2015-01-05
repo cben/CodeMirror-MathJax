@@ -37,22 +37,34 @@ CodeMirror.hookMath = function(editor, MathJax) {
   function formatDuration(ms) { return (ms / 1000).toFixed(3) + "s"; }
 
   var t0 = timestampMs();
+
   // Goal: Prevent errors on IE.  Might not actually log.
   // While we are at it, prepend timestamp to all messages.
-  function log() {
+
+  // The only way to keep console messages associated with original
+  // line is to use original `console.log` or its .bind().
+  // The way to use these helpers is the awkward:
+  //
+  //     logf()(message, obl)
+  //     errorf()(message, obl)
+  //
+  function logmaker(logMethod) {
     try {
-      var args = Array.prototype.slice.call(arguments, 0);
-      args.unshift(formatDuration(timestampMs() - t0));
-      console.log.apply(console, args);
-    } catch(err) {}
+      // console.log is native function, has no .bind in some browsers.
+      return Function.prototype.bind.call(console[logMethod], console,
+					  formatDuration(timestampMs() - t0));
+    } catch(err) {
+      return function() {
+	try {
+	  var args = Array.prototype.slice.call(arguments, 0);
+	  args.unshift(formatDuration(timestampMs() - t0));
+	  console[logMethod].apply(console, args);
+	} catch(err) {}
+      };
+    }
   }
-  function error() {
-    try {
-      var args = Array.prototype.slice.call(arguments, 0);
-      args.unshift(formatDuration(timestampMs() - t0));
-      console.error.apply(console, args);
-    } catch(err) {}
-  }
+  function logf() { return logmaker("log"); }
+  function errorf() { return logmaker("error"); }
 
   // Log time if non-negligible.
   function logFuncTime(func) {
@@ -61,12 +73,10 @@ CodeMirror.hookMath = function(editor, MathJax) {
       func.apply(this, arguments);
       var duration = timestampMs() - start;
       if(duration > 100) {
-        log((func.name || "<???>") + "() took " + formatDuration(duration));
+        logf()((func.name || "<???>") + "() took " + formatDuration(duration));
       }
     };
   }
-
-  var doc = editor.getDoc();
 
   // Position arithmetic
   // -------------------
@@ -93,6 +103,8 @@ CodeMirror.hookMath = function(editor, MathJax) {
   // ------------------------------
   // TODO: refactor this to generic simulation of cursor leave events.
 
+  var doc = editor.getDoc();
+
   // If cursor is inside a formula, we don't render it until the
   // cursor leaves it.  To cleanly detect when that happens we
   // still markText() it but without replacedWith and store the
@@ -104,12 +116,12 @@ CodeMirror.hookMath = function(editor, MathJax) {
       var oldRange = unrenderedMath.find();
       if(oldRange) {
         var text = doc.getRange(oldRange.from, oldRange.to);
-        error("overriding previous unrenderedMath:", text);
+        errorf()("overriding previous unrenderedMath:", text);
       } else {
-        error("overriding unrenderedMath whose .find() == undefined", text);
+        errorf()("overriding unrenderedMath whose .find() == undefined", text);
       }
     }
-    log("unrendering math", doc.getRange(fromTo.from, fromTo.to));
+    logf()("unrendering math", doc.getRange(fromTo.from, fromTo.to));
     unrenderedMath = doc.markText(fromTo.from, fromTo.to);
     unrenderedMath.xMathState = "unrendered"; // helps later remove only our marks.
   }
@@ -117,7 +129,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
   function unrenderMark(mark) {
     var range = mark.find();
     if(!range) {
-      error(mark, "mark.find() == undefined");
+      errorf()(mark, "mark.find() == undefined");
     } else {
       unrenderRange(range);
     }
@@ -131,13 +143,13 @@ CodeMirror.hookMath = function(editor, MathJax) {
       var unrenderedRange = unrenderedMath.find();
       if(!unrenderedRange) {
         // This happens, not yet sure when and if it's fine.
-        error(unrenderedMath, ".find() == undefined");
+        errorf()(unrenderedMath, ".find() == undefined");
         return;
       }
       if(posInsideRange(cursor, unrenderedRange)) {
-        log("cursorActivity", cursor, "in unrenderedRange", unrenderedRange);
+        logf()("cursorActivity", cursor, "in unrenderedRange", unrenderedRange);
       } else {
-        log("cursorActivity", cursor, "left unrenderedRange.", unrenderedRange);
+        logf()("cursorActivity", cursor, "left unrenderedRange.", unrenderedRange);
         unrenderedMath = null;
         processMath(unrenderedRange.from, unrenderedRange.to);
         flushMarkTextQueue();
@@ -195,10 +207,10 @@ CodeMirror.hookMath = function(editor, MathJax) {
   function processMath(from, to) {
     var elem = createMathElement(from, to);
     var text = elem.innerHTML;
-    log("typesetting", text, elem);
+    logf()("typesetting", text, elem);
     MathJax.Hub.Queue(["Typeset", MathJax.Hub, elem]);
     MathJax.Hub.Queue(function() {
-      log("done typesetting", text);
+      logf()("done typesetting", text);
       // TODO: what if doc changed while MathJax was typesetting?
       // TODO: behavior during selection?
       var cursor = doc.getCursor();
@@ -206,7 +218,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
       if(posInsideRange(cursor, {from: from, to: to})) {
         // This doesn't normally happen during editing, more likely
         // during initial pass.
-        error(cursor);
+        errorf()("posInsideRange", cursor, from, to, "=> not rendering");
         unrenderRange({from: from, to: to});
       } else {
         markTextQueue.push(function() {
@@ -225,7 +237,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
   function processLine(lineHandle) {
     var text = lineHandle.text;
     var line = doc.getLineNumber(lineHandle);
-    //log("processLine", line, text);
+    //logf()("processLine", line, text);
 
     // TODO: doesn't handle escaping, e.g. \$.  Doesn't check spaces before/after $ like pandoc.
     // TODO: matches inner $..$ in $$..$ etc.
@@ -262,7 +274,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
 
   // Documents don't batch "change" events, so should never have .next.
   CodeMirror.on(doc, "change", logFuncTime(function processChange(doc, changeObj) {
-    log("change", changeObj);
+    logf()("change", changeObj);
     // changeObj.{from,to} are pre-change coordinates; adding text.length
     // (number of inserted lines) is a conservative(?) fix.
     // TODO: use cm.changeEnd()
@@ -270,7 +282,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
     clearOurMarksInRange(Pos(changeObj.from.line, 0), Pos(endLine, 0));
     doc.eachLine(changeObj.from.line, endLine, processLine);
     if("next" in changeObj) {
-      error("next");
+      errorf()("next");
       processChange(changeObj.next);
     }
     MathJax.Hub.Queue(flushMarkTextQueue);
@@ -280,13 +292,13 @@ CodeMirror.hookMath = function(editor, MathJax) {
   editor.renderAllMath = logFuncTime(function renderAllMath() {
     doc.eachLine(processLine);
     MathJax.Hub.Queue(flushMarkTextQueue);
-    MathJax.Hub.Queue(function() { log("-- All math rendered. --"); });
+    MathJax.Hub.Queue(function() { logf()("-- All math rendered. --"); });
   })
 
   // Make sure stuff doesn't somehow remain in markTextQueue.
   setInterval(function() {
     if(markTextQueue.length != 0) {
-      error("Fallaback flushMarkTextQueue:", markTextQueue.length, "elements");
+      errorf()("Fallaback flushMarkTextQueue:", markTextQueue.length, "elements");
       flushMarkTextQueue();
     }
   }, 500);
