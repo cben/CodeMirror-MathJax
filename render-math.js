@@ -38,7 +38,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
 
   var t0 = timestampMs();
 
-  // Goal: Prevent errors on IE.  Might not actually log.
+  // Goal: Prevent errors on IE (but do strive to log somehow if IE Dev Tools are open).
   // While we are at it, prepend timestamp to all messages.
 
   // The only way to keep console messages associated with original
@@ -58,7 +58,12 @@ CodeMirror.hookMath = function(editor, MathJax) {
 	try {
 	  var args = Array.prototype.slice.call(arguments, 0);
 	  args.unshift(formatDuration(timestampMs() - t0));
-	  console[logMethod].apply(console, args);
+	  if(console[logMethod].apply) {
+	    console[logMethod].apply(console, args);
+	  } else {
+	    /* IE's console.log doesn't have .apply, .call, or bind. */
+	    console.log(Array.prototype.slice.call(args));
+	  }
 	} catch(err) {}
       };
     }
