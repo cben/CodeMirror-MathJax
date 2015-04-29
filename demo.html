@@ -99,10 +99,10 @@ so `\begin{equation}` works at first glance — but it's pretty broken:
 $$\sum^b_c \frac{1}{a}$$
 > BUG: numbering is unusable, increments with every edit.
 
-This is a forward reference [$\ref{ref2}$] and another $\eqref{ref2}$ for the following equation:
+This is a forward reference [\ref{ref2}] and another \eqref{ref2} for the following equation:
 \begin{equation}x+1\over\sqrt{1-x^2}\label{ref2}\end{equation}
-This is a back reference [$\ref{ref2}$] and another $\eqref{ref2}$ for the  preceding equation.
-> minor BUG: `\ref` and `\eqref` are only recognized inside math.
+This is a back reference [\ref{ref2}] and another \eqref{ref2} for the preceding equation.
+(can also put `[eq]ref` inside math:  $\ref{ref2} \Rightarrow \eqref{ref2}$.)
 > BUG: labels are completely broken, result in error second time equation is typeset!
 
 \begin{align} x& = y_1-y_2+y_3-y_5+y_8-\dots && \text{by \eqref{ref1}}\\ & = y'\circ y^* && \text{(by \eqref{ref3})}\\ & = y(0) y' && \text {by Axiom 1.} \end{align}
