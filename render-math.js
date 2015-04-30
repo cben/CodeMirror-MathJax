@@ -54,7 +54,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
       return Function.prototype.bind.call(console[logMethod], console,
 					  formatDuration(timestampMs() - t0));
     } catch(err) {
-      return function() {
+      return function(var_args) {
 	try {
 	  var args = Array.prototype.slice.call(arguments, 0);
 	  args.unshift(formatDuration(timestampMs() - t0));
@@ -73,7 +73,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
 
   // Log time if non-negligible.
   function logFuncTime(func) {
-    return function() {
+    return function(var_args) {
       var start = timestampMs();
       func.apply(this, arguments);
       var duration = timestampMs() - start;
@@ -81,6 +81,16 @@ CodeMirror.hookMath = function(editor, MathJax) {
         logf()((func.name || "<???>") + "() took " + formatDuration(duration));
       }
     };
+  }
+
+  function catchAllErrors(func) {
+    return function(var_args) {
+      try {
+	return func.apply(this, arguments);
+      } catch(err) {
+	errorf()("catching error:", err);
+      }
+    }
   }
 
   // Position arithmetic
@@ -141,9 +151,10 @@ CodeMirror.hookMath = function(editor, MathJax) {
     mark.clear();
   }
 
-  editor.on("cursorActivity", function(doc) {
+  editor.on("cursorActivity", catchAllErrors(function(doc) {
     if(unrenderedMath !== null) {
       // TODO: selection behavior?
+      // TODO: handle multiple cursors/selections
       var cursor = doc.getCursor();
       var unrenderedRange = unrenderedMath.find();
       if(unrenderedRange === undefined) {
@@ -160,7 +171,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
         flushMarkTextQueue();
       }
     }
-  });
+  }));
 
   // Rendering on changes
   // --------------------
@@ -230,9 +241,9 @@ CodeMirror.hookMath = function(editor, MathJax) {
           var mark = doc.markText(from, to, {replacedWith: elem,
                                              clearOnEnter: false});
 	  mark.xMathState = "rendered"; // helps later remove only our marks.
-          CodeMirror.on(mark, "beforeCursorEnter", function() {
+          CodeMirror.on(mark, "beforeCursorEnter", catchAllErrors(function() {
             unrenderMark(mark);
-          });
+          }));
         });
       }
     });
@@ -282,8 +293,10 @@ CodeMirror.hookMath = function(editor, MathJax) {
     }
   }
 
-  // Documents don't batch "change" events, so should never have .next.
-  CodeMirror.on(doc, "change", logFuncTime(function processChange(doc, changeObj) {
+  // CM < 4 batched editor's "change" events via a .next property, which we'd
+  // have to chase - and what's worse, adjust all coordinates.
+  // Documents' "change" events were never batched, so not a problem.
+  CodeMirror.on(doc, "change", catchAllErrors(logFuncTime(function processChange(doc, changeObj) {
     logf()("change", changeObj);
     // changeObj.{from,to} are pre-change coordinates; adding text.length
     // (number of inserted lines) is a conservative(?) fix.
@@ -296,7 +309,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
       processChange(changeObj.next);
     }
     MathJax.Hub.Queue(flushMarkTextQueue);
-  }));
+  })));
 
   // First pass - process whole document.
   editor.renderAllMath = logFuncTime(function renderAllMath() {
