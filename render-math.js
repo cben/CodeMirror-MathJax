@@ -117,13 +117,13 @@ CodeMirror.hookMath = function(editor, MathJax) {
   var unrenderedMath = null;
 
   function unrenderRange(fromTo) {
-    if(unrenderedMath) {
+    if(unrenderedMath !== null) {
       var oldRange = unrenderedMath.find();
-      if(oldRange) {
+      if(oldRange !== undefined) {
         var text = doc.getRange(oldRange.from, oldRange.to);
         errorf()("overriding previous unrenderedMath:", text);
       } else {
-        errorf()("overriding unrenderedMath whose .find() == undefined", text);
+        errorf()("overriding unrenderedMath whose .find() === undefined", text);
       }
     }
     logf()("unrendering math", doc.getRange(fromTo.from, fromTo.to));
@@ -133,8 +133,8 @@ CodeMirror.hookMath = function(editor, MathJax) {
 
   function unrenderMark(mark) {
     var range = mark.find();
-    if(!range) {
-      errorf()(mark, "mark.find() == undefined");
+    if(range === undefined) {
+      errorf()(mark, "mark.find() === undefined");
     } else {
       unrenderRange(range);
     }
@@ -142,13 +142,13 @@ CodeMirror.hookMath = function(editor, MathJax) {
   }
 
   editor.on("cursorActivity", function(doc) {
-    if(unrenderedMath) {
+    if(unrenderedMath !== null) {
       // TODO: selection behavior?
       var cursor = doc.getCursor();
       var unrenderedRange = unrenderedMath.find();
-      if(!unrenderedRange) {
+      if(unrenderedRange === undefined) {
         // This happens, not yet sure when and if it's fine.
-        errorf()(unrenderedMath, ".find() == undefined");
+        errorf()(unrenderedMath, ".find() === undefined");
         return;
       }
       if(posInsideRange(cursor, unrenderedRange)) {
@@ -304,7 +304,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
 
   // Make sure stuff doesn't somehow remain in markTextQueue.
   setInterval(function() {
-    if(markTextQueue.length != 0) {
+    if(markTextQueue.length !== 0) {
       errorf()("Fallaback flushMarkTextQueue:", markTextQueue.length, "elements");
       flushMarkTextQueue();
     }
