@@ -265,6 +265,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
     for(var i = 0; i < oldMarks.length; i++) {
       var mark = oldMarks[i];
       if(mark.xMathState === undefined) {
+        logf()("not touching foreign mark at", mark.find());
         continue;
       }
 
@@ -273,8 +274,10 @@ CodeMirror.hookMath = function(editor, MathJax) {
       var found = mark.find();
       if(found.line !== undefined ?
 	 /* bookmark */ posInsideRange(found, {from: from, to: to}) :
-	 /* marked range */ rangesOverlap(found, {from: from, to: to})) {
-          mark.clear();
+	 /* marked range */ rangesOverlap(found, {from: from, to: to}))
+      {
+	logf()("cleared mark at", found, "as part of range:", from, to);
+        mark.clear();
       }
     }
   }
