@@ -271,7 +271,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
       // Verify it's in range, even after findMarks() - it returns
       // marks that touch the range, we want at least one char overlap.
       var found = mark.find();
-      if(found.line ?
+      if(found.line !== undefined ?
 	 /* bookmark */ posInsideRange(found, {from: from, to: to}) :
 	 /* marked range */ rangesOverlap(found, {from: from, to: to})) {
           mark.clear();
