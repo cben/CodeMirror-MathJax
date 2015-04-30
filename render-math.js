@@ -264,8 +264,8 @@ CodeMirror.hookMath = function(editor, MathJax) {
     var oldMarks = doc.findMarks ? doc.findMarks(from, to) : doc.getAllMarks();
     for(var i = 0; i < oldMarks.length; i++) {
       var mark = oldMarks[i];
-      if(mark.xMathState !== undefined) {
-	continue;
+      if(mark.xMathState === undefined) {
+        continue;
       }
 
       // Verify it's in range, even after findMarks() - it returns
