@@ -52,19 +52,19 @@ CodeMirror.hookMath = function(editor, MathJax) {
     try {
       // console.log is native function, has no .bind in some browsers.
       return Function.prototype.bind.call(console[logMethod], console,
-					  formatDuration(timestampMs() - t0));
+                                          formatDuration(timestampMs() - t0));
     } catch(err) {
       return function(var_args) {
-	try {
-	  var args = Array.prototype.slice.call(arguments, 0);
-	  args.unshift(formatDuration(timestampMs() - t0));
-	  if(console[logMethod].apply) {
-	    console[logMethod].apply(console, args);
-	  } else {
-	    /* IE's console.log doesn't have .apply, .call, or bind. */
-	    console.log(Array.prototype.slice.call(args));
-	  }
-	} catch(err) {}
+        try {
+          var args = Array.prototype.slice.call(arguments, 0);
+          args.unshift(formatDuration(timestampMs() - t0));
+          if(console[logMethod].apply) {
+            console[logMethod].apply(console, args);
+          } else {
+            /* IE's console.log doesn't have .apply, .call, or bind. */
+            console.log(Array.prototype.slice.call(args));
+          }
+        } catch(err) {}
       };
     }
   }
@@ -86,9 +86,9 @@ CodeMirror.hookMath = function(editor, MathJax) {
   function catchAllErrors(func) {
     return function(var_args) {
       try {
-	return func.apply(this, arguments);
+        return func.apply(this, arguments);
       } catch(err) {
-	errorf()("catching error:", err);
+        errorf()("catching error:", err);
       }
     }
   }
@@ -240,7 +240,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
         markTextQueue.push(function() {
           var mark = doc.markText(from, to, {replacedWith: elem,
                                              clearOnEnter: false});
-	  mark.xMathState = "rendered"; // helps later remove only our marks.
+          mark.xMathState = "rendered"; // helps later remove only our marks.
           CodeMirror.on(mark, "beforeCursorEnter", catchAllErrors(function() {
             unrenderMark(mark);
           }));
@@ -284,10 +284,10 @@ CodeMirror.hookMath = function(editor, MathJax) {
       // marks that touch the range, we want at least one char overlap.
       var found = mark.find();
       if(found.line !== undefined ?
-	 /* bookmark */ posInsideRange(found, {from: from, to: to}) :
-	 /* marked range */ rangesOverlap(found, {from: from, to: to}))
+         /* bookmark */ posInsideRange(found, {from: from, to: to}) :
+         /* marked range */ rangesOverlap(found, {from: from, to: to}))
       {
-	logf()("cleared mark at", found, "as part of range:", from, to);
+        logf()("cleared mark at", found, "as part of range:", from, to);
         mark.clear();
       }
     }
