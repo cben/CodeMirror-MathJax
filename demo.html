@@ -63,7 +63,7 @@
     </script>
     <!-- Safe extension (http://docs.mathjax.org/en/latest/safe-mode.html)
          only needed if editor content may be controlled by other users. -->
-    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML-full,Safe"></script>
+    <script src="../MathJax/MathJax.js?config=TeX-AMS_HTML-full,Safe"></script>
   </head>
   <body>
     <h1>attempt at CodeMirror + in-place MathJax</h1>
@@ -118,6 +118,9 @@ Use \foo: $\foo$
     xXxXxXxXxXxXxXxXxXxXxXxX
     $$\sum^b_c \frac{1}{a}$$
     xXxXxXxXxXxXxXxXxXxXxXxX
+
+--------------------------------------------------------------------------------
+
 </textarea></form>
     <script>
       CodeMirror.defineMathMode("markdown+math", {name: "markdown",
@@ -126,6 +129,11 @@ Use \foo: $\foo$
                                            {lineNumbers: true,
                                             lineWrapping: true,
                                             mode: "markdown+math"});
+      var text = editor.getValue(), repeatedText = "";
+      for(var i = 0; i < 10; i++) {
+        repeatedText += text;
+      }
+      editor.setValue(repeatedText);
       CodeMirror.hookMath(editor, MathJax);
       editor.renderAllMath();
     </script>
