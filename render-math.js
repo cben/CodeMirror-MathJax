@@ -233,12 +233,16 @@ CodeMirror.hookMath = function(editor, MathJax) {
 
   function processMath(from, to) {
     var elem = createMathElement(from, to);
+    elem.style.position = "absolute";
     typesettingDiv.appendChild(elem);
     var text = elem.innerHTML;
     logf()("typesetting", text, elem);
     MathJax.Hub.Queue(["Typeset", MathJax.Hub, elem]);
     MathJax.Hub.Queue(function() {
       logf()("done typesetting", text);
+      elem.parentNode.removeChild(elem);
+      elem.style.position = "static";
+
       // TODO: what if doc changed while MathJax was typesetting?
       // TODO: behavior during selection?
       var cursor = doc.getCursor();
