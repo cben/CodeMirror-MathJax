@@ -220,8 +220,20 @@ CodeMirror.hookMath = function(editor, MathJax) {
     });
   });
 
+  // MathJax doesn't support typesetting outside the DOM (https://github.com/mathjax/MathJax/issues/1185).
+  // We can't put it into a CodeMirror widget because CM might unattach it when it's outside viewport.
+  // So we need a stable invisible place to measure & typeset in.
+  var typesettingDiv = document.createElement("div");
+  typesettingDiv.style.position = "absolute";
+  typesettingDiv.style.height = 0;
+  typesettingDiv.style.overflow = "hidden";
+  typesettingDiv.style.visibility = "hidden";
+  typesettingDiv.className = "CodeMirror-MathJax";
+  editor.getWrapperElement().appendChild(typesettingDiv);
+
   function processMath(from, to) {
     var elem = createMathElement(from, to);
+    typesettingDiv.appendChild(elem);
     var text = elem.innerHTML;
     logf()("typesetting", text, elem);
     MathJax.Hub.Queue(["Typeset", MathJax.Hub, elem]);

@@ -130,11 +130,13 @@ Use \foo: $\foo$
                                            {lineNumbers: true,
                                             lineWrapping: true,
                                             mode: "markdown+math"});
+
       var text = editor.getValue(), repeatedText = "";
       for(var i = 0; i < 10; i++) {
         repeatedText += text;
       }
       editor.setValue(repeatedText);
+
       var t0 = new Date().getTime();
       CodeMirror.hookMath(editor, MathJax);
       editor.renderAllMath(function() {
