@@ -312,10 +312,13 @@ CodeMirror.hookMath = function(editor, MathJax) {
   })));
 
   // First pass - process whole document.
-  editor.renderAllMath = logFuncTime(function renderAllMath() {
+  editor.renderAllMath = logFuncTime(function renderAllMath(callback) {
     doc.eachLine(processLine);
     MathJax.Hub.Queue(flushMarkTextQueue);
     MathJax.Hub.Queue(function() { logf()("-- All math rendered. --"); });
+    if(callback) {
+      MathJax.Hub.Queue(callback);
+    }
   })
 
   // Make sure stuff doesn't somehow remain in markTextQueue.

@@ -67,7 +67,8 @@
   </head>
   <body>
     <h1>attempt at CodeMirror + in-place MathJax</h1>
-    <a href="https://github.com/cben/CodeMirror-MathJax">Source on github</a>
+    <a href="https://github.com/cben/CodeMirror-MathJax">Source on github</a> |
+    <span id="all-done-time">Rendering math...</span>
 
     <form><textarea id="code" autofocus>**To edit formulas, move cursor into them with arrow keys.**  Clicking with mouse should work but currently doesn't :-(.
 
@@ -134,8 +135,13 @@ Use \foo: $\foo$
         repeatedText += text;
       }
       editor.setValue(repeatedText);
+      var t0 = new Date().getTime();
       CodeMirror.hookMath(editor, MathJax);
-      editor.renderAllMath();
+      editor.renderAllMath(function() {
+          var t1 = new Date().getTime();
+          var text = " done in " + (t1-t0) + "ms.";
+          document.getElementById("all-done-time").appendChild(document.createTextNode(text));
+      });
     </script>
   </body>
 </html>
