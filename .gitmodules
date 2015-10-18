@@ -5,3 +5,6 @@
 [submodule "KaTeX"]
 	path = KaTeX
 	url = https://github.com/Khan/KaTeX
+[submodule "version.js"]
+	path = version.js
+	url = https://github.com/jstayton/version.js

@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="CodeMirror/lib/codemirror.css">
     <style>
       /* Expand editor to fit most of the page. */
-      html, body, form, textarea, .CodeMirror {
+      html, body, form.editor, textarea, .CodeMirror {
         height: 100%; width: 100%;
         -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
       }
@@ -25,7 +25,7 @@
          but also cause CM to auto-resize and never scroll
          (instead whole page scrolls), which makes CM slower.
         body { display: table; }
-        form { display: table-row; } */
+        form.editor { display: table-row; } */
 
       .CodeMirror { border: 1px solid silver; }
       /* Variable-width font to stress test layout. */
@@ -68,14 +68,24 @@
     </script>
     <!-- Safe extension (http://docs.mathjax.org/en/latest/safe-mode.html)
          only needed if editor content may be controlled by other users. -->
-    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML-full,Safe"></script>
+    <script src="version.js/build/version.js" data-url="cdnjs" data-lib="mathjax" data-file="MathJax.js?config=TeX-AMS_HTML-full,Safe" data-ver="2.4.0" data-param="mathjax"></script>
   </head>
   <body>
     <h1>attempt at CodeMirror + in-place MathJax</h1>
+    <form method="GET" action="">
+      MathJax version: <select name="mathjax">
+	<option value="2.3.0">2.3.0</option>
+	<option value="2.4.0" selected>2.4.0</option>
+	<option value="2.5.3">2.5.3</option>
+	<option value="2.6.0-beta.1">2.6.0-beta.1</option>
+      </select>
+      <input type="submit" value="Load"></input>
+    </form>
+
     <a href="https://github.com/cben/CodeMirror-MathJax">Source on github</a> |
     <span id="all-done-time">Rendering math...</span>
 
-    <form><textarea id="code" autofocus>**To edit formulas, move cursor into them with arrow keys.**  Clicking with mouse should work but currently doesn't :-(.
+    <form class="editor"><textarea id="code" autofocus>**To edit formulas, move cursor into them with arrow keys.**  Clicking with mouse should work but currently doesn't :-(.
 
 # Inline math $a&lt;b&gt;c$
 > xXxXxXxXxXxXxXxXxXxXxXxX
