@@ -73,7 +73,10 @@
     <script src="version.js/build/version.js" data-ver="2.4.0" data-param="mathjax" data-url="//cdnjs.cloudflare.com/ajax/libs/mathjax/{{VERSION}}/MathJax.js?config=TeX-AMS_HTML-full,Safe"></script>
   </head>
   <body>
-    <h1>attempt at CodeMirror + in-place MathJax</h1>
+    <h1>attempt at CodeMirror + in-place MathJax
+      [<a href="https://github.com/cben/CodeMirror-MathJax">source on github</a>]
+    </h1>
+
     <form method="GET" action="">
       MathJax version: <select name="mathjax">
 	<option value="2.3.0">2.3.0</option>
@@ -91,8 +94,7 @@
       <input type="submit" value="Load"></input> (for any other versions edit URL params)
     </form>
 
-    <a href="https://github.com/cben/CodeMirror-MathJax">Source on github</a> |
-    <span id="all-done-time">Rendering math...</span>
+    <p><i id="progress">Loading...</i></p>
 
     <form class="editor"><textarea id="code" autofocus>**To edit formulas, move cursor into them with arrow keys.**  Clicking with mouse should work but currently doesn't :-(.
 
@@ -160,13 +162,15 @@ Use \foo: $\foo$
         repeatedText += text;
       }
       editor.setValue(repeatedText);
+      editor.refresh();
+      document.getElementById("progress").innerHTML = "Rendering math..."
 
       var t0 = new Date().getTime();
       CodeMirror.hookMath(editor, MathJax);
       editor.renderAllMath(function() {
           var t1 = new Date().getTime();
-          var text = " done in " + (t1-t0) + "ms.";
-          document.getElementById("all-done-time").appendChild(document.createTextNode(text));
+          var text = "Finished rendering math in " + (t1-t0) + "ms.";
+          document.getElementById("progress").innerHTML = text;
       });
     </script>
   </body>
