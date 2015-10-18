@@ -4,15 +4,16 @@
     <meta charset="utf-8">
     <title>attempt at CodeMirror + in-place MathJax</title>
 
-    <script src="CodeMirror/lib/codemirror.js"></script>
+    <script src="version.js/build/version.js" data-url="cdnjs" data-lib="codemirror" data-ver="5.7.0" data-param="codemirror" data-file="codemirror"></script>
     <!-- load render-math.js early to verify its dependencies are at
          call time and not load time -->
     <script src="render-math.js"></script>
-    <script src="CodeMirror/addon/mode/multiplex.js"></script>
-    <script src="CodeMirror/mode/stex/stex.js"></script>
-    <script src="CodeMirror/mode/markdown/markdown.js"></script>
+    <script src="version.js/build/version.js" data-url="cdnjs" data-lib="codemirror" data-ver="5.7.0" data-param="codemirror" data-file="addon/mode/multiplex"></script>
+    <script src="version.js/build/version.js" data-url="cdnjs" data-lib="codemirror" data-ver="5.7.0" data-param="codemirror" data-file="mode/stex/stex"></script>
+    <script src="version.js/build/version.js" data-url="cdnjs" data-lib="codemirror" data-ver="5.7.0" data-param="codemirror" data-file="mode/markdown/markdown"></script>
 
-    <link rel="stylesheet" href="CodeMirror/lib/codemirror.css">
+    <!-- TODO: add <link> support to version.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.7.0/codemirror.css">
     <style>
       /* Expand editor to fit most of the page. */
       html, body, form.editor, textarea, .CodeMirror {
@@ -68,7 +69,8 @@
     </script>
     <!-- Safe extension (http://docs.mathjax.org/en/latest/safe-mode.html)
          only needed if editor content may be controlled by other users. -->
-    <script src="version.js/build/version.js" data-url="cdnjs" data-lib="mathjax" data-file="MathJax.js?config=TeX-AMS_HTML-full,Safe" data-ver="2.4.0" data-param="mathjax"></script>
+    <!-- using "data-url" to avoid trailing .js in default cdnjs template. -->
+    <script src="version.js/build/version.js" data-ver="2.4.0" data-param="mathjax" data-url="//cdnjs.cloudflare.com/ajax/libs/mathjax/{{VERSION}}/MathJax.js?config=TeX-AMS_HTML-full,Safe"></script>
   </head>
   <body>
     <h1>attempt at CodeMirror + in-place MathJax</h1>
@@ -78,8 +80,15 @@
 	<option value="2.4.0" selected>2.4.0</option>
 	<option value="2.5.3">2.5.3</option>
 	<option value="2.6.0-beta.1">2.6.0-beta.1</option>
+      </select> |
+      CodeMirror version: <select name="codemirror">
+	<option value="3.24.0">3.24.0</option>
+	<option value="4.8.0">4.8.0</option>
+	<option value="4.13.0">4.13.0</option>
+	<option value="5.0.0">5.0.0</option>
+	<option value="5.7.0" selected>5.7.0</option>
       </select>
-      <input type="submit" value="Load"></input>
+      <input type="submit" value="Load"></input> (for any other versions edit URL params)
     </form>
 
     <a href="https://github.com/cben/CodeMirror-MathJax">Source on github</a> |
