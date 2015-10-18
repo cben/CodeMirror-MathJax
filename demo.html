@@ -54,8 +54,13 @@
         tex2jax: {
           inlineMath: [ ['$','$'], ["\\(","\\)"] ],
           displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
-          processEscapes: true
+          processEscapes: true,
+          /* Previews of all kinds are useless — math is hidden until fully rendered. */
+          preview: "none"
         },
+        /* "CHTML-preview" is for MathJax 2.5, "fast-preview" is for 2.6. */
+        "CHTML-preview": { disabled: true },
+        "fast-preview": { disabled: true },
         TeX: { noErrors: { disabled: true },
                equationNumbers: { autoNumber: "AMS" },
                extensions: ["autoload-all.js"] }
