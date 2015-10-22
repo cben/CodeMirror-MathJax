@@ -3,13 +3,20 @@
 Experimenting to replace $math$ (and related LaTeX syntaxes) with formulas in CodeMirror.
 Buggy and work-in-progress...
 
-Mostly tested with recend CodeMirror 4.x versions but probably works with any 3.x too (open a bug if not). 
+Mostly tested with CodeMirror 4.x, 5.x versions but probably works with 3.x too.
+
+Performance is currently OK with MathJax 2.4, horribly slow with 2.5 or 2.6.  Working on it...
 
 ## Demo
 
 http://cben.github.io/CodeMirror-MathJax/demo.html
 
 If you just want to use this for writing, check out [mathdown.net](http://mathdown.net) powered by https://github.com/cben/mathdown.
+
+## UNSTABLE API
+
+I'm currently changing the API at will.
+If you want to use this for anything do contact me <beni.cherniavsky@gmail.com> — I'll be glad to help.
 
 ## Git trivia
 

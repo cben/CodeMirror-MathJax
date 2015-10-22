@@ -4,18 +4,18 @@
     <meta charset="utf-8">
     <title>attempt at CodeMirror + in-place MathJax</title>
 
-    <script src="CodeMirror/lib/codemirror.js"></script>
+    <script src="version.js/build/version.js" data-url="cdnjs" data-lib="codemirror" data-ver="5.7.0" data-param="codemirror" data-file="codemirror"></script>
     <!-- load render-math.js early to verify its dependencies are at
          call time and not load time -->
     <script src="render-math.js"></script>
-    <script src="CodeMirror/addon/mode/multiplex.js"></script>
-    <script src="CodeMirror/mode/stex/stex.js"></script>
-    <script src="CodeMirror/mode/markdown/markdown.js"></script>
+    <script src="version.js/build/version.js" data-url="cdnjs" data-lib="codemirror" data-ver="5.7.0" data-param="codemirror" data-file="addon/mode/multiplex"></script>
+    <script src="version.js/build/version.js" data-url="cdnjs" data-lib="codemirror" data-ver="5.7.0" data-param="codemirror" data-file="mode/stex/stex"></script>
+    <script src="version.js/build/version.js" data-url="cdnjs" data-lib="codemirror" data-ver="5.7.0" data-param="codemirror" data-file="mode/markdown/markdown"></script>
 
-    <link rel="stylesheet" href="CodeMirror/lib/codemirror.css">
+    <script src="version.js/build/version.js" data-type="css" data-url="cdnjs" data-lib="codemirror" data-ver="5.7.0" data-param="codemirror" data-file="codemirror"></script>
     <style>
       /* Expand editor to fit most of the page. */
-      html, body, form, textarea, .CodeMirror {
+      html, body, form.editor, textarea, .CodeMirror {
         height: 100%; width: 100%;
         -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
       }
@@ -25,7 +25,7 @@
          but also cause CM to auto-resize and never scroll
          (instead whole page scrolls), which makes CM slower.
         body { display: table; }
-        form { display: table-row; } */
+        form.editor { display: table-row; } */
 
       .CodeMirror { border: 1px solid silver; }
       /* Variable-width font to stress test layout. */
@@ -54,8 +54,13 @@
         tex2jax: {
           inlineMath: [ ['$','$'], ["\\(","\\)"] ],
           displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
-          processEscapes: true
+          processEscapes: true,
+          /* Previews of all kinds are useless — math is hidden until fully rendered. */
+          preview: "none"
         },
+        /* "CHTML-preview" is for MathJax 2.5, "fast-preview" is for 2.6. */
+        "CHTML-preview": { disabled: true },
+        "fast-preview": { disabled: true },
         TeX: { noErrors: { disabled: true },
                equationNumbers: { autoNumber: "AMS" },
                extensions: ["autoload-all.js"] }
@@ -63,13 +68,34 @@
     </script>
     <!-- Safe extension (http://docs.mathjax.org/en/latest/safe-mode.html)
          only needed if editor content may be controlled by other users. -->
-    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML-full,Safe"></script>
+    <!-- using "data-url" to avoid trailing .js in default cdnjs template. -->
+    <script src="version.js/build/version.js" data-ver="2.4.0" data-param="mathjax" data-url="cdnjs" data-file="MathJax.js" data-suffix="?config=TeX-AMS_HTML-full,Safe"></script>
   </head>
   <body>
-    <h1>attempt at CodeMirror + in-place MathJax</h1>
-    <a href="https://github.com/cben/CodeMirror-MathJax">Source on github</a>
+    <h1>attempt at CodeMirror + in-place MathJax
+      [<a href="https://github.com/cben/CodeMirror-MathJax">source on github</a>]
+    </h1>
 
-    <form><textarea id="code" autofocus>**To edit formulas, move cursor into them with arrow keys.**  Clicking with mouse should work but currently doesn't :-(.
+    <form method="GET" action="">
+      MathJax version: <select name="mathjax">
+	<option value="2.3.0">2.3.0</option>
+	<option value="2.4.0" selected>2.4.0</option>
+	<option value="2.5.3">2.5.3</option>
+	<option value="2.6.0-beta.1">2.6.0-beta.1</option>
+      </select> |
+      CodeMirror version: <select name="codemirror">
+	<option value="3.24.0">3.24.0</option>
+	<option value="4.8.0">4.8.0</option>
+	<option value="4.13.0">4.13.0</option>
+	<option value="5.0.0">5.0.0</option>
+	<option value="5.7.0" selected>5.7.0</option>
+      </select>
+      <input type="submit" value="Load"></input> (for any other versions edit URL params)
+    </form>
+
+    <p><i id="progress">Loading...</i></p>
+
+    <form class="editor"><textarea id="code" autofocus>**To edit formulas, move cursor into them with arrow keys.**  Clicking with mouse should work but currently doesn't :-(.
 
 # Inline math $a&lt;b&gt;c$
 > xXxXxXxXxXxXxXxXxXxXxXxX
@@ -129,13 +155,22 @@ Use \foo: $\foo$
                                            {lineNumbers: true,
                                             lineWrapping: true,
                                             mode: "markdown+math"});
+
       var text = editor.getValue(), repeatedText = "";
       for(var i = 0; i < 10; i++) {
         repeatedText += text;
       }
       editor.setValue(repeatedText);
+      editor.refresh();
+      document.getElementById("progress").innerHTML = "Rendering math..."
+
+      var t0 = new Date().getTime();
       CodeMirror.hookMath(editor, MathJax);
-      editor.renderAllMath();
+      editor.renderAllMath(function() {
+          var t1 = new Date().getTime();
+          var text = "Finished rendering math in " + (t1-t0) + "ms.";
+          document.getElementById("progress").innerHTML = text;
+      });
     </script>
   </body>
 </html>
