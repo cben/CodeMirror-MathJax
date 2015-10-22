@@ -12,8 +12,7 @@
     <script src="version.js/build/version.js" data-url="cdnjs" data-lib="codemirror" data-ver="5.7.0" data-param="codemirror" data-file="mode/stex/stex"></script>
     <script src="version.js/build/version.js" data-url="cdnjs" data-lib="codemirror" data-ver="5.7.0" data-param="codemirror" data-file="mode/markdown/markdown"></script>
 
-    <!-- TODO: add <link> support to version.js -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.7.0/codemirror.css">
+    <script src="version.js/build/version.js" data-type="css" data-url="cdnjs" data-lib="codemirror" data-ver="5.7.0" data-param="codemirror" data-file="codemirror"></script>
     <style>
       /* Expand editor to fit most of the page. */
       html, body, form.editor, textarea, .CodeMirror {
@@ -70,7 +69,7 @@
     <!-- Safe extension (http://docs.mathjax.org/en/latest/safe-mode.html)
          only needed if editor content may be controlled by other users. -->
     <!-- using "data-url" to avoid trailing .js in default cdnjs template. -->
-    <script src="version.js/build/version.js" data-ver="2.4.0" data-param="mathjax" data-url="//cdnjs.cloudflare.com/ajax/libs/mathjax/{{VERSION}}/MathJax.js?config=TeX-AMS_HTML-full,Safe"></script>
+    <script src="version.js/build/version.js" data-ver="2.4.0" data-param="mathjax" data-url="cdnjs" data-file="MathJax.js" data-suffix="?config=TeX-AMS_HTML-full,Safe"></script>
   </head>
   <body>
     <h1>attempt at CodeMirror + in-place MathJax
