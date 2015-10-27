@@ -169,7 +169,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
         logf()("cursorActivity", cursor, "left unrenderedRange.", unrenderedRange);
         unrenderedMath = null;
         processMath(unrenderedRange.from, unrenderedRange.to);
-        flushMarkTextQueue();
+        flushTypesettingQueue(flushMarkTextQueue);
       }
     }
   }));
@@ -233,6 +233,30 @@ CodeMirror.hookMath = function(editor, MathJax) {
   typesettingDiv.className = "CodeMirror-MathJax";
   editor.getWrapperElement().appendChild(typesettingDiv);
 
+  // MathJax is much faster when typesetting many formulas at once.
+  // Each batch's elements will go into a div under typesettingDiv.
+  var typesettingQueueDiv = document.createElement("div");
+  var typesettingQueue = [];  // functions to call after typesetting.
+  var flushTypesettingQueue = logFuncTime(function flushTypesettingQueue(callback) {
+    var currentDiv = typesettingQueueDiv;
+    typesettingQueueDiv = document.createElement("div");
+    var currentQueue = typesettingQueue;
+    typesettingQueue = [];
+
+    typesettingDiv.appendChild(currentDiv);
+    logf()("-- typesetting", currentDiv.children.length, "formulas --");
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, currentDiv]);
+    MathJax.Hub.Queue(function() {
+      currentDiv.parentNode.removeChild(currentDiv);
+      for(var i = 0; i < currentQueue.length; i++) {
+        currentQueue[i]();
+      }
+      if(callback) {
+        callback();
+      }
+    });
+  });
+
   function processMath(from, to) {
     // By the time typesetting completes, from/to might shift.
     // Use temporary non-widget marker to track the exact range to be replaced.
@@ -244,9 +268,9 @@ CodeMirror.hookMath = function(editor, MathJax) {
     typesettingDiv.appendChild(elem);
 
     var text = elem.innerHTML;
-    logf()("typesetting", text, elem);
-    MathJax.Hub.Queue(["Typeset", MathJax.Hub, elem]);
-    MathJax.Hub.Queue(function() {
+    logf()("going to typeset", text, elem);
+    typesettingQueueDiv.appendChild(elem);
+    typesettingQueue.push(function() {
       logf()("done typesetting", text);
       elem.parentNode.removeChild(elem);
       elem.style.position = "static";
@@ -341,20 +365,28 @@ CodeMirror.hookMath = function(editor, MathJax) {
       errorf()("next");
       processChange(changeObj.next);
     }
-    MathJax.Hub.Queue(flushMarkTextQueue);
+    flushTypesettingQueue(flushMarkTextQueue);
   })));
 
   // First pass - process whole document.
   editor.renderAllMath = logFuncTime(function renderAllMath(callback) {
     doc.eachLine(processLine);
-    MathJax.Hub.Queue(flushMarkTextQueue);
-    MathJax.Hub.Queue(function() { logf()("-- All math rendered. --"); });
-    if(callback) {
-      MathJax.Hub.Queue(callback);
-    }
-  })
+    flushTypesettingQueue(function() {
+      flushMarkTextQueue();
+      logf()("---- All math rendered. ----");
+      if(callback) {
+        callback();
+      }
+    });
+  });
 
-  // Make sure stuff doesn't somehow remain in markTextQueue.
+  // Make sure stuff doesn't somehow remain in the batching queues.
+  setInterval(function() {
+    if(typesettingQueue.length !== 0) {
+      errorf()("Fallaback flushTypesettingQueue:", typesettingQueue.length, "elements");
+      flushTypesettingQueue();
+    }
+  }, 500);
   setInterval(function() {
     if(markTextQueue.length !== 0) {
       errorf()("Fallaback flushMarkTextQueue:", markTextQueue.length, "elements");
