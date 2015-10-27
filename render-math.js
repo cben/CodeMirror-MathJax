@@ -25,7 +25,8 @@ CodeMirror.defineMathMode = function(name, outerModeSpec) {
   });
 };
 
-// Usage: first call CodeMirror.hookMath(editor, MathJax), then editor.renderAllMath() to process initial content.
+// Usage: first call CodeMirror.hookMath(editor, MathJax),
+// then editor.renderAllMath() to process initial content.
 // TODO: simplify usage when initial pass becomes cheap.
 // TODO: use defineOption(), support clearing widgets and removing handlers.
 CodeMirror.hookMath = function(editor, MathJax) {
@@ -210,6 +211,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
 
   // MathJax returns rendered DOMs asynchroonously.
   // Batch inserting those into the editor to reduce layout & painting.
+  // (that was the theory; it didn't noticably improve speed in practice.)
   var markTextQueue = [];
   var flushMarkTextQueue = logFuncTime(function flushMarkTextQueue() {
     editor.operation(function() {
@@ -232,9 +234,15 @@ CodeMirror.hookMath = function(editor, MathJax) {
   editor.getWrapperElement().appendChild(typesettingDiv);
 
   function processMath(from, to) {
+    // By the time typesetting completes, from/to might shift.
+    // Use temporary non-widget marker to track the exact range to be replaced.
+    var typesettingMark = doc.markText(from, to, {className: "math-typesetting"});
+    typesettingMark.xMathState = "typesetting";
+
     var elem = createMathElement(from, to);
     elem.style.position = "absolute";
     typesettingDiv.appendChild(elem);
+
     var text = elem.innerHTML;
     logf()("typesetting", text, elem);
     MathJax.Hub.Queue(["Typeset", MathJax.Hub, elem]);
@@ -243,7 +251,16 @@ CodeMirror.hookMath = function(editor, MathJax) {
       elem.parentNode.removeChild(elem);
       elem.style.position = "static";
 
-      // TODO: what if doc changed while MathJax was typesetting?
+      var range = typesettingMark.find();
+      if(!range) {
+        // Was removed by deletion and/or clearOurMarksInRange().
+        logf()("done typesetting but range disappered, dropping.");
+        return;
+      }
+      var from = range.from;
+      var to = range.to;
+      typesettingMark.clear();
+
       // TODO: behavior during selection?
       var cursor = doc.getCursor();
 
