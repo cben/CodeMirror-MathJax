@@ -1,3 +1,11 @@
+# UPDATE: See the more mature https://github.com/SamyPesse/codemirror-widgets
+
+codemirror-widgets powers [GitBook's new desktop editor](https://www.gitbook.com/blog/releases/editor-5-beta),
+is abstracted to supports rendering in-place various things (math, links, images),
+and seems generally well structured.
+
+I haven't carefully reviewed codemirror-widgets yet, but I'll probably abandon this project in favor of improving codemirror-widgets, and switch [mathdown](https://github.com/cben/mathdown) to it too.
+
 # Attempt at CodeMirror + in-place MathJax
 
 Experimenting to replace $math$ (and related LaTeX syntaxes) with formulas in CodeMirror.
