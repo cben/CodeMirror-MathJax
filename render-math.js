@@ -230,7 +230,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
   typesettingDiv.style.height = 0;
   typesettingDiv.style.overflow = "hidden";
   typesettingDiv.style.visibility = "hidden";
-  typesettingDiv.className = "CodeMirror-MathJax";
+  typesettingDiv.className = "CodeMirror-MathJax-typesetting";
   editor.getWrapperElement().appendChild(typesettingDiv);
 
   // MathJax is much faster when typesetting many formulas at once.
