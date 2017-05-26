@@ -4,15 +4,15 @@
     <meta charset="utf-8">
     <title>attempt at CodeMirror + in-place MathJax</title>
 
-    <script src="version.js/build/version.js" data-url="cdnjs" data-lib="codemirror" data-ver="5.7.0" data-param="codemirror" data-file="codemirror"></script>
+    <script src="version.js/build/version.js" data-url="cdnjs" data-lib="codemirror" data-ver="5.26.0" data-param="codemirror" data-file="codemirror"></script>
     <!-- load render-math.js early to verify its dependencies are at
          call time and not load time -->
     <script src="render-math.js"></script>
-    <script src="version.js/build/version.js" data-url="cdnjs" data-lib="codemirror" data-ver="5.7.0" data-param="codemirror" data-file="addon/mode/multiplex"></script>
-    <script src="version.js/build/version.js" data-url="cdnjs" data-lib="codemirror" data-ver="5.7.0" data-param="codemirror" data-file="mode/stex/stex"></script>
-    <script src="version.js/build/version.js" data-url="cdnjs" data-lib="codemirror" data-ver="5.7.0" data-param="codemirror" data-file="mode/markdown/markdown"></script>
+    <script src="version.js/build/version.js" data-url="cdnjs" data-lib="codemirror" data-ver="5.26.0" data-param="codemirror" data-file="addon/mode/multiplex"></script>
+    <script src="version.js/build/version.js" data-url="cdnjs" data-lib="codemirror" data-ver="5.26.0" data-param="codemirror" data-file="mode/stex/stex"></script>
+    <script src="version.js/build/version.js" data-url="cdnjs" data-lib="codemirror" data-ver="5.26.0" data-param="codemirror" data-file="mode/markdown/markdown"></script>
 
-    <script src="version.js/build/version.js" data-type="css" data-url="cdnjs" data-lib="codemirror" data-ver="5.7.0" data-param="codemirror" data-file="codemirror"></script>
+    <script src="version.js/build/version.js" data-type="css" data-url="cdnjs" data-lib="codemirror" data-ver="5.26.0" data-param="codemirror" data-file="codemirror"></script>
     <style>
       /* Expand editor to fit most of the page. */
       html, body, form.editor, textarea, .CodeMirror {
@@ -69,8 +69,9 @@
     </script>
     <!-- Safe extension (http://docs.mathjax.org/en/latest/safe-mode.html)
          only needed if editor content may be controlled by other users. -->
-    <script src="version.js/build/version.js" data-ver="2.4.0" data-param="mathjax" data-url="cdnjs" data-lib="mathjax" data-file="MathJax.js" data-suffix="?config=TeX-AMS_HTML-full,Safe"></script>
+    <script src="version.js/build/version.js" data-ver="2.7.1" data-param="mathjax" data-url="cdnjs" data-lib="mathjax" data-file="MathJax.js" data-suffix="?config=TeX-AMS_HTML-full,Safe"></script>
   </head>
+
   <body>
     <h1>attempt at CodeMirror + in-place MathJax
       [<a href="https://github.com/cben/CodeMirror-MathJax">source on github</a>]
@@ -79,16 +80,18 @@
     <form method="GET" action="">
       MathJax version: <select name="mathjax">
 	<option value="2.3.0">2.3.0</option>
-	<option value="2.4.0" selected>2.4.0</option>
+	<option value="2.4.0">2.4.0</option>
 	<option value="2.5.3">2.5.3</option>
 	<option value="2.6.1">2.6.1</option>
+	<option value="2.7.1" selected>2.7.1</option>
       </select> |
       CodeMirror version: <select name="codemirror">
 	<option value="3.24.0">3.24.0</option>
 	<option value="4.8.0">4.8.0</option>
 	<option value="4.13.0">4.13.0</option>
 	<option value="5.0.0">5.0.0</option>
-	<option value="5.11.0" selected>5.11.0</option>
+	<option value="5.11.0">5.11.0</option>
+        <option value="5.26.0" selected>5.26.0</option>
       </select>
       <input type="submit" value="Load"></input> (for any other versions edit URL params)
     </form>
