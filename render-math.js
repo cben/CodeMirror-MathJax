@@ -178,9 +178,12 @@ CodeMirror.hookMath = function(editor, MathJax) {
   // --------------------
 
   function createMathElement(from, to) {
-    // TODO: would MathJax.HTML make this more portable?
     var text = doc.getRange(from, to);
+    // Putting span inside pre for CSS to apply better while rendering inside typesettingDiv.
+    var lineElem = document.createElement("pre");
     var elem = document.createElement("span");
+    lineElem.appendChild(elem);
+
     // Display math becomes a <div> (inside this <span>), which
     // confuses CM badly ("DOM node must be an inline element").
     elem.style.display = "inline-block";
@@ -189,7 +192,7 @@ CodeMirror.hookMath = function(editor, MathJax) {
       text = text + " \\(" + text + "\\)";
     }
     elem.appendChild(document.createTextNode(text));
-    elem.title = text;
+    elem.title = text;  // TODO move before newcommand doubling.
 
     var isDisplay = /^\$\$|^\\\[|^\\begin/.test(text);  // TODO: probably imprecise.
 
@@ -201,12 +204,27 @@ CodeMirror.hookMath = function(editor, MathJax) {
     // start of line.
     var insideFormula = Pos(from.line, from.ch + 1);
     var tokenType = editor.getTokenAt(insideFormula, true).type;
+
+    // TODO: use doc.lineInfo() to also get styles set by doc.addLineClass().
+    var lineClassName = "CodeMirror-line ";
     var className = isDisplay ? "display_math" : "inline_math";
+    //
     if(tokenType && !/delim/.test(tokenType)) {
-      className += " cm-" + tokenType.replace(/ +/g, " cm-");
+      var cmClasses = tokenType.split(/ +/);
+      for (var i = 0; i < cmClasses.length; i++) {
+        // `line-background-.*` classes probably don't matter?
+        // The background element they apply to is not a parent of the pre > span.
+        var match = cmClasses[i].match(/line-(.*)/);
+        if (match) {
+          lineClassName += " " + match[1];
+        } else {
+          className += " cm-" + cmClasses[i];
+        }
+      }
     }
+    lineElem.className = lineClassName;
     elem.className = className;
-    return elem;
+    return {line: lineElem, span: elem, text: text};
   }
 
   // MathJax returns rendered DOMs asynchroonously.
@@ -227,9 +245,9 @@ CodeMirror.hookMath = function(editor, MathJax) {
   // So we need a stable invisible place to measure & typeset in.
   var typesettingDiv = document.createElement("div");
   typesettingDiv.style.position = "absolute";
-  typesettingDiv.style.height = 0;
-  typesettingDiv.style.overflow = "hidden";
-  typesettingDiv.style.visibility = "hidden";
+  //typesettingDiv.style.height = 0;
+  typesettingDiv.style.overflow = "visible";//"hidden";
+  typesettingDiv.style.visibility = "visible";//"hidden";
   typesettingDiv.className = "CodeMirror-MathJax-typesetting";
   editor.getWrapperElement().appendChild(typesettingDiv);
 
@@ -263,17 +281,16 @@ CodeMirror.hookMath = function(editor, MathJax) {
     var typesettingMark = doc.markText(from, to, {className: "math-typesetting"});
     typesettingMark.xMathState = "typesetting";
 
-    var elem = createMathElement(from, to);
-    elem.style.position = "absolute";
-    typesettingDiv.appendChild(elem);
+    var elems = createMathElement(from, to);
+    elems.line.style.position = "absolute";
 
-    var text = elem.innerHTML;
-    logf()("going to typeset", text, elem);
-    typesettingQueueDiv.appendChild(elem);
+    var text = elems.text;
+    logf()("going to typeset", text, elems.line);
+    typesettingQueueDiv.appendChild(elems.line);
     typesettingQueue.push(function() {
       logf()("done typesetting", text);
-      elem.parentNode.removeChild(elem);
-      elem.style.position = "static";
+      elems.line.parentNode.removeChild(elems.line);
+      //elems.line.style.position = "static";
 
       var range = typesettingMark.find();
       if(!range) {
@@ -295,7 +312,8 @@ CodeMirror.hookMath = function(editor, MathJax) {
         unrenderRange({from: from, to: to});
       } else {
         markTextQueue.push(function() {
-          var mark = doc.markText(from, to, {replacedWith: elem,
+          //debugger;
+          var mark = doc.markText(from, to, {replacedWith: elems.span.cloneNode(true),
                                              clearOnEnter: false});
           mark.xMathState = "rendered"; // helps later remove only our marks.
           CodeMirror.on(mark, "beforeCursorEnter", catchAllErrors(function() {
